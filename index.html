@@ -123,6 +123,17 @@ button:focus-visible{outline:3px solid var(--ball);outline-offset:3px}
 .fca{border:2px solid var(--short);border-radius:16px;padding:12px 14px;margin:12px 0}
 .fca strong{color:var(--short)}
 
+.ticker{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.ticker div{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.35;padding:7px 10px;border-radius:12px;background:var(--paper);border:1.5px solid var(--line)}
+.ticker b{flex:none;font-size:10.5px;font-weight:800;letter-spacing:.05em;background:var(--ink);color:var(--paper);border-radius:6px;padding:2px 6px;margin-top:1px}
+.ticker .crash{border-color:var(--short)}
+.ticker .crash b{background:var(--short);color:#fff}
+.sell-btn{width:100%;border:0;border-radius:20px;padding:15px 18px;background:var(--ball);color:#1A1205;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:800;box-shadow:0 4px 0 rgba(0,0,0,.22);transition:transform .08s}
+.sell-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.22)}
+.sell-btn #sellLbl{font-size:24px;letter-spacing:-.01em}
+.sell-btn #sellVal{font-size:18px;font-variant-numeric:tabular-nums;white-space:pre}
+.sell-btn:disabled{opacity:.6;cursor:default}
+.chart .mark{font-size:11.5px;font-weight:800}
 /* ===== Niveau 2 : circuit ===== */
 .race{position:fixed;inset:0;z-index:40;background:#3F8040;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden}
 .race #rc{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -193,6 +204,7 @@ button:focus-visible{outline:3px solid var(--ball);outline-offset:3px}
       <h1 class="name" id="name"></h1>
       <p class="teaser" id="teaser"></p>
       <svg class="chart" id="chart" viewBox="0 0 320 168" role="img"></svg>
+      <div class="ticker hide" id="ticker" aria-live="polite"></div>
       <div class="result" id="result">
         <div class="delta" id="delta"></div>
         <div class="how" id="how"></div>
@@ -210,6 +222,7 @@ button:focus-visible{outline:3px solid var(--ball);outline-offset:3px}
         <button class="big-btn b-long" id="bLong">↑ <span data-i18n="long">Long</span><small data-i18n="longSub"></small></button>
       </div>
     </div>
+    <div id="selling" class="hide"><button class="sell-btn" id="bSell"><span id="sellLbl" data-i18n="sell">Vendre</span><b id="sellVal"></b></button></div>
     <button class="next hide" id="bNext"><i id="nextFill"></i><span id="nextTxt" data-i18n="next">Suivant</span></button>
   </footer>
 </div>
@@ -534,6 +547,19 @@ const STR = {
     finQ: ['Lent comme un lundi matin. Mais ma voiture est entière.', 'Propre. Un peu lent, mais propre.', 'Tu conduis mieux que tu ne trades. Ne le répète à personne.'],
     nigelSays: q => `Nigel : « ${q} »`, again2: 'Rejouer le niveau 2',
     pauseT: 'Pause', pause1: 'Nigel attend, le moteur tourne.', pause2: 'Nigel tapote nerveusement le tableau de bord.', resume: 'Reprendre',
+    l3: 'Niveau 3 : sors avant la bulle', bubbleLbl: 'Bulle', bubbleKind: 'Bulle spéculative', buying: 'Ping achète pour £1 M…',
+    sell: 'Vendre', soldLbl: 'Vendu', flash: 'FLASH', crashTag: 'KRACH', entry: 'prix d’achat',
+    soldMark: v => `vendu ${v}`, peakMark: v => `sommet ${v}`,
+    howSold: (e, p, c) => c >= 0 ? `Vendu à ${e}. Sommet : ${p}. Tu as capté ${c}\u00A0% de la hausse.` : `Vendu à ${e}, sous ton prix d’achat. Sommet : ${p}.`,
+    howLiq: (e, p) => `Pas vendu. Sommet à ${p}, puis liquidation forcée à ${e}.`,
+    nextBubble: 'Bulle suivante',
+    l3P: 'Cinq bulles spéculatives de l’histoire. Au début de chacune, Ping achète pour 1 million. Le cours monte de plus en plus vite, puis tout s’effondre. À toi de vendre au bon moment.',
+    l3Rules: [['l', 'Hausse', 'Plus tu attends, plus tu gagnes.'], ['s', 'Krach', 'Si tu n’as pas vendu à temps, Ping est liquidé au plus bas.'], ['o', 'Flash', 'Lis les nouvelles : quand l’euphorie devient folle, la fin approche.'], ['n', 'Pièges', 'Certaines baisses ne sont que des corrections. Garde ton sang-froid.']],
+    l3Go: 'Acheter la première bulle', l3Keys: 'Au clavier : espace pour vendre, Entrée pour continuer.',
+    yourBest3: v => `Ton record au niveau 3 : ${v}`, again3: 'Rejouer le niveau 3',
+    ranks3: [['Acheteur de tulipes', 'Ping a tout gardé jusqu’au bout. Plusieurs fois.'], ['Main tremblante', 'Sorti vivant, mais souvent bien trop tôt.'], ['Bon flair', 'Ping sent venir les krachs. Presque toujours.'], ['Sniper de la City', 'Nigel commence à demander conseil à Ping.'], ['Sorti au sommet', 'Newton aurait voulu ton numéro.']],
+    captAvg: 'Hausse captée en moyenne', crashes: 'Krachs subis', bestExit: 'Meilleure sortie', worstB: 'Pire bulle',
+    fine3: 'Bulles réelles, graphiques illustratifs. Les bulles ne préviennent pas toujours, Nigel non plus.',
   },
   en: {
     title: 'Ping, trader in London', pnlLbl: 'Ping’s P&L', roundLbl: 'Opportunity', limit: 'Loss limit: 10 million',
@@ -575,6 +601,19 @@ const STR = {
     finQ: ['Slow as a Monday morning. But my car is in one piece.', 'Clean. A bit slow, but clean.', 'You drive better than you trade. Don’t tell anyone I said that.'],
     nigelSays: q => `Nigel: “${q}”`, again2: 'Play level 2 again',
     pauseT: 'Pause', pause1: 'Nigel is waiting, engine running.', pause2: 'Nigel drums nervously on the dashboard.', resume: 'Resume',
+    l3: 'Level 3: get out before the bubble bursts', bubbleLbl: 'Bubble', bubbleKind: 'Speculative bubble', buying: 'Ping buys £1m…',
+    sell: 'Sell', soldLbl: 'Sold', flash: 'NEWS', crashTag: 'CRASH', entry: 'entry price',
+    soldMark: v => `sold ${v}`, peakMark: v => `peak ${v}`,
+    howSold: (e, p, c) => c >= 0 ? `Sold at ${e}. Peak: ${p}. You captured ${c}% of the rise.` : `Sold at ${e}, below your entry price. Peak: ${p}.`,
+    howLiq: (e, p) => `Never sold. Peak at ${p}, then forced liquidation at ${e}.`,
+    nextBubble: 'Next bubble',
+    l3P: 'Five speculative bubbles from history. At the start of each one, Ping buys 1 million’s worth. The price rises faster and faster, then everything collapses. It’s up to you to sell at the right moment.',
+    l3Rules: [['l', 'Rise', 'The longer you wait, the more you make.'], ['s', 'Crash', 'If you haven’t sold in time, Ping is liquidated at the bottom.'], ['o', 'News', 'Read the headlines: when the euphoria turns crazy, the end is near.'], ['n', 'Traps', 'Some dips are only corrections. Keep your nerve.']],
+    l3Go: 'Buy the first bubble', l3Keys: 'Keyboard: space to sell, Enter to continue.',
+    yourBest3: v => `Your level 3 best: ${v}`, again3: 'Play level 3 again',
+    ranks3: [['Tulip buyer', 'Ping held on to the bitter end. Several times.'], ['Shaky hands', 'Got out alive, but often far too early.'], ['Good nose', 'Ping can smell a crash coming. Almost always.'], ['City sniper', 'Nigel is starting to ask Ping for advice.'], ['Sold at the top', 'Newton would have wanted your number.']],
+    captAvg: 'Average share of the rise captured', crashes: 'Crashes suffered', bestExit: 'Best exit', worstB: 'Worst bubble',
+    fine3: 'Real bubbles, illustrative charts. Bubbles don’t always give a warning, and neither does Nigel.',
   },
 };
 const T = () => STR[LANG];
@@ -653,8 +692,9 @@ function applyStatic() {
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t[el.dataset.i18n]; });
   document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t[el.dataset.i18nAria]));
   $('.limit').title = t.limit;
+  $('[data-i18n="roundLbl"]').textContent = MODE === 3 ? t.bubbleLbl : t.roundLbl;
   $('#chart').setAttribute('aria-label', t.chartAria);
-  if (!S) { $('#name').textContent = t.idleName; $('#teaser').textContent = t.idleTeaser; say(t.ready); drawChart({ ipo: false }); }
+  if (!S && !S3) { $('#name').textContent = t.idleName; $('#teaser').textContent = t.idleTeaser; say(t.ready); drawChart({ ipo: false }); }
 }
 function setLang(l) { LANG = l; store.set('lang', l); applyStatic(); }
 
@@ -752,6 +792,7 @@ function dealCards() {
 }
 function newGame() {
   closeModal();
+  S3 = null; cancelAnimationFrame(raf3); setMode(1);
   S = { cards: dealCards(), round: -1, pnl: 0, hist: [], insiderAt: 3 + ((Math.random() * 6) | 0), insider: null, phase: 'idle' };
   updateTop();
   nextRound();
@@ -885,7 +926,7 @@ function endGame(reason) {
   $('#toMenu').onclick = () => { S = null; resetBoard(); intro(); };
 }
 function resetBoard() {
-  cancelAnimationFrame(raf); clearTimeout(nextTimer);
+  cancelAnimationFrame(raf); clearTimeout(nextTimer); cancelAnimationFrame(raf3); setMode(1);
   $('#result').classList.remove('on'); $('#date').textContent = '–'; $('#kind').textContent = '';
   $('#deciding').classList.remove('hide'); $('#bNext').classList.add('hide');
   $('#stake').textContent = money(3e6, false); $('#timeBar').style.width = '100%';
@@ -906,12 +947,15 @@ function intro() {
     <ul class="rules">${t.rules.map(r => `<li><span class="chip ${r[0]}">${r[1]}</span><span>${r[2]}</span></li>`).join('')}</ul>
     <button class="go" id="start">${t.l1}</button>
     <button class="alt" id="startL2">${t.l2}</button>
+    <button class="alt" id="startL3">${t.l3}</button>
     ${best !== null ? `<p class="fine">${t.yourRecord(money(best))}</p>` : ''}
     ${raceBest !== null ? `<p class="fine" style="margin-top:2px">${t.yourRace(fmtTime(raceBest))}</p>` : ''}
+    ${store.get('best3', null) !== null ? `<p class="fine" style="margin-top:2px">${t.yourBest3(money(store.get('best3')))}</p>` : ''}
     <p class="fine">${t.keysHint}</p>`);
   document.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { if (b.dataset.lang !== LANG) { setLang(b.dataset.lang); intro(); } });
   $('#start').onclick = newGame;
   $('#startL2').onclick = () => { closeModal(); raceIntro(); };
+  $('#startL3').onclick = l3Intro;
 }
 
 // =================== NIVEAU 2 : la Racing Car de Nigel ===================
@@ -1086,8 +1130,10 @@ function raceFinish() {
       <p class="fine" style="margin-top:0">${rec ? t.newRecord : t.record(fmtTime(prev))} ${t.stars3}</p>
       <p>${t.nigelSays(t.finQ[stars - 1])}</p>
       <button class="go" id="rRetry">${t.again2}</button>
+      <button class="alt" id="toL3">${t.l3}</button>
       <button class="alt" id="rMenu">${t.menu}</button>`);
     $('#rRetry').onclick = () => { closeModal(); raceIntro(true); };
+    $('#toL3').onclick = () => { cancelAnimationFrame(rRaf); RS = null; $('#race').classList.add('hide'); closeModal(); l3Intro(); };
     $('#rMenu').onclick = exitRace;
   }, 1500);
 }
@@ -1158,10 +1204,265 @@ function racePause(msgKey) {
   $('#rMenu').onclick = exitRace;
 }
 
+// =================== NIVEAU 3 : sors avant la bulle ===================
+// [nom, lieu et date, contexte, [trois signaux d'euphorie], krach, dénouement]
+const B = (P, bottom, fr, en) => ({ P, bottom, id: fr[0], fr, en });
+const BUBBLES = [
+  B(6, 0.25,
+    ['Tulipes', 'Amsterdam, 1636', 'Les bulbes de tulipes rares s’échangent de plus en plus cher dans les tavernes hollandaises. Ping achète.', ['Les contrats portent désormais sur des bulbes encore en terre.', 'On raconte qu’un seul bulbe vaut le prix d’une maison sur un canal.', 'Ton cordonnier hypothèque son atelier pour acheter des tulipes.'], 'Février 1637 : à Haarlem, une vente aux enchères ne trouve plus aucun acheteur.', 'Les prix s’effondrent en quelques jours. La tulipe redevient une fleur.'],
+    ['Tulips', 'Amsterdam, 1636', 'Rare tulip bulbs change hands at ever higher prices in Dutch taverns. Ping buys.', ['Contracts now trade on bulbs that are still in the ground.', 'Word is that a single bulb is worth a canal house.', 'Your cobbler has mortgaged his workshop to buy tulips.'], 'February 1637: an auction in Haarlem finds no buyers at all.', 'Prices collapse within days. The tulip goes back to being a flower.']),
+  B(5, 0.45,
+    ['Compagnie des mers du Sud', 'Londres, 1720', 'La Compagnie des mers du Sud reprend une partie de la dette publique britannique. Son action décolle.', ['Des dizaines de sociétés sans activité réelle lèvent des fonds à Exchange Alley.', 'Le Parlement vote le Bubble Act pour freiner les sociétés concurrentes.', 'Isaac Newton, qui avait vendu avec profit, rachète près du sommet.'], 'Septembre 1720 : l’action dévisse.', 'Newton y aurait perdu une fortune. Il aurait dit savoir calculer le mouvement des astres, mais pas la folie des hommes.'],
+    ['South Sea Company', 'London, 1720', 'The South Sea Company takes over part of Britain’s national debt. Its shares take off.', ['Dozens of companies with no real business raise money in Exchange Alley.', 'Parliament passes the Bubble Act to curb competing ventures.', 'Isaac Newton, who had sold at a profit, buys back in near the top.'], 'September 1720: the shares go into free fall.', 'Newton reportedly lost a fortune. He is said to have remarked that he could calculate the motion of the heavenly bodies, but not the madness of people.']),
+  B(6, 0.3,
+    ['Compagnie du Mississippi', 'Paris, 1719', 'L’Écossais John Law dirige la Compagnie du Mississippi et la Banque royale. Paris s’arrache les actions.', ['Rue Quincampoix, on raconte qu’un bossu loue son dos comme pupitre pour signer les ordres.', 'La banque imprime des billets pour soutenir le cours.', 'Le mot « millionnaire » entre dans la langue.'], '1720 : les grands investisseurs échangent leurs billets contre de l’or.', 'Le système s’effondre et John Law quitte la France en catastrophe.'],
+    ['Mississippi Company', 'Paris, 1719', 'Scotsman John Law runs the Mississippi Company and the royal bank. Paris fights over the shares.', ['On Rue Quincampoix, a hunchback is said to rent out his back as a writing desk for orders.', 'The bank prints notes to prop up the share price.', 'The word “millionaire” enters the language.'], '1720: big investors start swapping their notes for gold.', 'The system collapses and John Law flees France.']),
+  B(3.5, 0.55,
+    ['Chemins de fer', 'Londres, 1845', 'Le Royaume-Uni se couvre de projets de chemins de fer. Chaque nouvelle ligne promet des profits.', ['Le Parlement autorise des centaines de nouvelles lignes.', 'Des journaux entiers ne parlent plus que de chemins de fer.', 'Même les sœurs Brontë achètent des actions de chemin de fer.'], 'Fin 1845 : la Banque d’Angleterre relève ses taux et les promesses s’effondrent.', 'Beaucoup de lignes ne seront jamais construites. Celles qui le sont forment pourtant le réseau britannique.'],
+    ['Railway mania', 'London, 1845', 'Britain is covered in railway projects. Every new line promises profits.', ['Parliament authorises hundreds of new lines.', 'Whole newspapers now write about nothing but railways.', 'Even the Brontë sisters are buying railway shares.'], 'Late 1845: the Bank of England raises rates and the promises fall apart.', 'Many lines are never built. Those that are still form Britain’s rail network.']),
+  B(4, 0.35,
+    ['Wall Street', 'New York, 1928', 'Les années folles. On achète des actions à crédit en n’apportant que 10 % de la mise.', ['Les prêts pour acheter des actions battent tous les records.', 'Le cireur de chaussures te donne des tuyaux boursiers.', 'Un célèbre économiste affirme que les actions ont atteint un plateau durablement élevé.'], 'Octobre 1929 : jeudi noir, puis mardi noir.', 'En 1932, le Dow Jones a perdu près de 90 % depuis son sommet.'],
+    ['Wall Street', 'New York, 1928', 'The Roaring Twenties. People buy shares on margin, putting down just 10%.', ['Loans to buy shares break every record.', 'The shoeshine boy gives you stock tips.', 'A famous economist declares that stocks have reached a permanently high plateau.'], 'October 1929: Black Thursday, then Black Tuesday.', 'By 1932, the Dow has lost almost 90% from its peak.']),
+  B(3.5, 0.6,
+    ['Bourse de Tokyo', 'Tokyo, 1988', 'L’économie japonaise semble invincible. La bourse et l’immobilier de Tokyo s’envolent.', ['Les banques proposent des prêts immobiliers sur 100 ans.', 'On dit que le terrain du palais impérial vaut plus que toute la Californie.', 'Les entreprises gagnent plus en bourse qu’avec leurs propres produits.'], 'Décembre 1989 : la Banque du Japon relève ses taux.', 'Le Nikkei mettra 34 ans à retrouver son sommet du 29 décembre 1989.'],
+    ['Tokyo stock market', 'Tokyo, 1988', 'Japan’s economy looks unstoppable. Tokyo stocks and property soar.', ['Banks offer 100-year mortgages.', 'Word is the Imperial Palace grounds are worth more than all of California.', 'Companies make more money on the stock market than from their own products.'], 'December 1989: the Bank of Japan raises rates.', 'The Nikkei takes 34 years to regain its peak of 29 December 1989.']),
+  B(5, 0.4,
+    ['Bulle internet', 'Nasdaq, 1999', 'Internet va tout changer. Il suffit d’ajouter « .com » à son nom pour que l’action monte.', ['Des start-up sans bénéfices valent plus que des industriels centenaires.', 'Ton dentiste ferme son cabinet pour faire du day trading.', 'Le Nasdaq a doublé en un an.'], 'Mars 2000 : le Nasdaq atteint son sommet, puis tout se retourne.', 'En 2002, le Nasdaq a perdu près de 80 %. Beaucoup de « .com » disparaissent.'],
+    ['Dot-com bubble', 'Nasdaq, 1999', 'The internet will change everything. Add “.com” to your name and your shares go up.', ['Loss-making start-ups are worth more than century-old industrial firms.', 'Your dentist closes his practice to day-trade.', 'The Nasdaq has doubled in a year.'], 'March 2000: the Nasdaq peaks, then everything turns.', 'By 2002 the Nasdaq has lost almost 80%. Many “.com”s vanish.']),
+  B(5.5, 0.5,
+    ['Bitcoin', 'Crypto, 2021', 'Taux à zéro, confinements, applis de trading gratuites : le bitcoin décolle.', ['Des images numériques de singes se vendent des centaines de milliers de dollars.', 'Un pays fait du bitcoin une monnaie légale.', 'Des célébrités vantent des cryptos sur les réseaux sociaux.'], 'Novembre 2021 : sommet vers 69 000 dollars.', 'Un an plus tard, il vaut environ 16 000 dollars, après plusieurs faillites retentissantes, dont FTX.'],
+    ['Bitcoin', 'Crypto, 2021', 'Zero rates, lockdowns, free trading apps: bitcoin takes off.', ['Digital pictures of apes sell for hundreds of thousands of dollars.', 'A country makes bitcoin legal tender.', 'Celebrities promote crypto on social media.'], 'November 2021: peak near $69,000.', 'A year later it trades around $16,000, after several spectacular collapses, FTX among them.']),
+];
+const bx = b => { const a = b[LANG]; return { n: a[0], d: a[1], t: a[2], sig: a[3], crash: a[4], o: a[5] }; };
+const LINES3 = {
+  fr: {
+    start: ['Cette fois, je ne serai pas gourmand.', 'J’entre, je sors à temps. Facile.', 'Je sens que ça va monter.'],
+    rise: ['Encore un peu…', 'Je vais m’acheter un yacht.', 'Ça ne peut que monter !', 'Nigel va me supplier de lui donner des tuyaux.'],
+    dip: ['Ça baisse… c’est la fin ?', 'Simple correction. Je crois.', 'Tiens bon, Ping.'],
+    crash: ['NON NON NON !', 'VENDS ! VENDS !', 'Tout le monde sort en même temps !'],
+    sold: ['Vendu ! Je regarde la suite depuis le balcon.', 'Je prends mes gains.'],
+    inCrash: ['Sorti dans la bousculade.', 'Sauvé… à moitié.'],
+    early: ['Trop tôt… ça a continué sans moi.', 'J’aurais pu attendre.'],
+    good: ['Sorti presque au sommet !', 'Champagne !'],
+    liq: ['Il ne reste plus rien…', 'Je suis resté jusqu’au bout. Grave erreur.'],
+  },
+  en: {
+    start: ['This time I won’t be greedy.', 'In, then out in time. Easy.', 'I can feel it going up.'],
+    rise: ['Just a bit more…', 'I’m buying a yacht.', 'It can only go up!', 'Nigel will be begging me for tips.'],
+    dip: ['It’s dropping… is this it?', 'Just a correction. I think.', 'Hold on, Ping.'],
+    crash: ['NO NO NO!', 'SELL! SELL!', 'Everyone is heading for the exit!'],
+    sold: ['Sold! Watching the rest from the balcony.', 'Taking my profits.'],
+    inCrash: ['Got out in the stampede.', 'Saved… half of it.'],
+    early: ['Too early… it kept going without me.', 'I could have waited.'],
+    good: ['Out near the top!', 'Champagne!'],
+    liq: ['Nothing left…', 'I stayed to the bitter end. Big mistake.'],
+  },
+};
+const ROUNDS3 = 5, STAKE3 = 1e6, TMAX = 12.5, DC = 1.6;
+let S3 = null, raf3 = 0, last3 = 0, MODE = 1;
+const fmtX = v => '×' + fmt(v, 1);
+
+function setMode(m) {
+  MODE = m;
+  $('#deciding').classList.toggle('hide', m !== 1);
+  $('#selling').classList.toggle('hide', m !== 3);
+  $('.limit').classList.toggle('hide', m !== 1);
+  $('#ticker').innerHTML = ''; $('#ticker').classList.toggle('hide', m !== 3);
+  $('[data-i18n="roundLbl"]').textContent = m === 3 ? T().bubbleLbl : T().roundLbl;
+}
+function l3Intro() {
+  const t = T(), b3 = store.get('best3', null);
+  openModal(`
+    <h2 class="rank" style="font-size:28px;margin:0">${t.l3}</h2>
+    <p>${t.l3P}</p>
+    <ul class="rules">${t.l3Rules.map(r => `<li><span class="chip ${r[0]}">${r[1]}</span><span>${r[2]}</span></li>`).join('')}</ul>
+    <button class="go" id="g3">${t.l3Go}</button>
+    <button class="alt" id="b3">${t.menu}</button>
+    ${b3 !== null ? `<p class="fine">${t.yourBest3(money(b3))}</p>` : ''}
+    <p class="fine">${t.l3Keys}</p>`);
+  $('#g3').onclick = newGame3;
+  $('#b3').onclick = () => { S3 = null; resetBoard(); intro(); };
+}
+function newGame3() {
+  closeModal();
+  S = null; cancelAnimationFrame(raf); clearTimeout(nextTimer);
+  const recent = new Set(store.get('recent3', []));
+  const pool = shuffle(BUBBLES.slice()).sort((a, b) => recent.has(a.id) - recent.has(b.id)).slice(0, ROUNDS3);
+  store.set('recent3', pool.map(b => b.id));
+  S3 = { bubbles: pool, round: -1, pnl: 0, hist: [], phase: 'idle' };
+  setMode(3);
+  updateTop3();
+  nextBubble();
+}
+function updateTop3() {
+  const el = $('#pnl');
+  el.textContent = money(S3 ? S3.pnl : 0);
+  el.className = 'pnl' + (S3 && S3.pnl > 500 ? ' up' : S3 && S3.pnl < -500 ? ' down' : '');
+  $('#roundNo').textContent = S3 && S3.round >= 0 ? `${Math.min(S3.round + 1, ROUNDS3)} / ${ROUNDS3}` : '–';
+}
+function nextBubble() {
+  if (!S3) return;
+  if (S3.round + 1 >= ROUNDS3) return endGame3();
+  S3.round++;
+  const b = S3.bubbles[S3.round], x = bx(b), t = T();
+  const Tc = rnd(5.2, 10.2);
+  const dips = [];
+  const nd = Math.random() < 0.6 ? 2 : 1;
+  for (let i = 0; i < nd; i++) dips.push({ t: Tc * rnd(0.3, 0.74), d: rnd(0.1, 0.17) });
+  const noise = []; let z = 0;
+  for (let i = 0; i < Math.ceil((TMAX + 4) / 0.05) + 2; i++) { z = z * 0.85 + gauss() * 0.022; noise.push(z); }
+  Object.assign(S3, {
+    b, P: b.P * rnd(0.82, 1.18), bottom: b.bottom * rnd(0.85, 1.15), Tc, dips, noise,
+    sigT: [0.32, 0.6, 0.86].map(f => (f + rnd(-0.04, 0.04)) * Tc), sigShown: 0,
+    t: 0, pts: [], sold: null, soldT: 0, peak: 1, yMax: 2.2, phase: 'wait', lastPt: -1, crashShown: false, top: null, lastSay: 0, cur: 1,
+  });
+  $('#date').textContent = x.d; $('#kind').textContent = t.bubbleKind; $('#name').textContent = x.n; $('#teaser').textContent = x.t;
+  $('#result').classList.remove('on'); $('#ticker').innerHTML = '';
+  $('#bNext').classList.add('hide'); $('#selling').classList.remove('hide');
+  const sb = $('#bSell'); sb.disabled = true; $('#sellLbl').textContent = t.buying; $('#sellVal').textContent = '';
+  mood('neutral'); say(pick(LINES3[LANG].start));
+  updateTop3(); drawBubble();
+  setTimeout(() => {
+    if (!S3 || S3.phase !== 'wait' || S3.b !== b) return;
+    S3.phase = 'run'; sb.disabled = false; $('#sellLbl').textContent = t.sell;
+    last3 = 0; cancelAnimationFrame(raf3); raf3 = requestAnimationFrame(loop3);
+  }, 2200);
+}
+function noiseAt(t) { const i = Math.max(0, t / 0.05), k = Math.floor(i), f = i - k, n = S3.noise; return Math.exp((n[k] || 0) * (1 - f) + (n[k + 1] || 0) * f); }
+function price3(t) {
+  if (t <= S3.Tc) {
+    let p = Math.exp(Math.log(S3.P) * Math.pow(t / S3.Tc, 1.8));
+    for (const d of S3.dips) { const u = t - d.t; if (u > 0 && u < 1.4) { const k = u < 0.5 ? u / 0.5 : 1 - (u - 0.5) / 0.9; p *= 1 - d.d * k; } }
+    return p * noiseAt(t);
+  }
+  if (S3.top === null) S3.top = price3(S3.Tc);
+  const u = Math.min(1, (t - S3.Tc) / DC);
+  return S3.top * Math.pow(S3.bottom / S3.top, 1 - Math.pow(1 - u, 2.2)) * (u < 1 ? noiseAt(t) : 1);
+}
+function addHeadline(text, crash) {
+  const el = document.createElement('div');
+  if (crash) el.className = 'crash';
+  el.innerHTML = `<b>${crash ? T().crashTag : T().flash}</b><span></span>`;
+  el.querySelector('span').textContent = text;
+  const tk = $('#ticker'); tk.prepend(el);
+  while (tk.children.length > 2) tk.lastChild.remove();
+  if (!reduce) el.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 260 });
+}
+function loop3(now) {
+  if (!S3 || (S3.phase !== 'run' && S3.phase !== 'after')) return;
+  const dt = last3 ? Math.min(0.05, (now - last3) / 1000) : 0; last3 = now;
+  if ($('#modal').classList.contains('on')) { raf3 = requestAnimationFrame(loop3); return; }
+  S3.t += dt * (S3.sold !== null ? 2.6 : 1);
+  const t = S3.t, p = price3(t);
+  S3.cur = p; S3.peak = Math.max(S3.peak, p);
+  if (t - S3.lastPt >= 0.05) { S3.pts.push([t, p]); S3.lastPt = t; }
+  const x = bx(S3.b), Lp = LINES3[LANG];
+  while (S3.sigShown < 3 && t >= S3.sigT[S3.sigShown]) { addHeadline(x.sig[S3.sigShown], false); S3.sigShown++; }
+  if (!S3.crashShown && t >= S3.Tc) {
+    S3.crashShown = true; addHeadline(x.crash, true);
+    if (S3.sold === null) { mood('panic'); say(pick(Lp.crash)); S3.lastSay = t; }
+  }
+  if (S3.sold === null && t < S3.Tc) {
+    if (p < S3.peak * 0.9 && t - S3.lastSay > 1.4) { mood('sad'); say(pick(Lp.dip)); S3.lastSay = t; }
+    else if (p >= S3.peak * 0.98 && t - S3.lastSay > 2.6 && t > 1) { mood('happy'); say(pick(Lp.rise)); S3.lastSay = t; }
+  }
+  if (S3.sold === null) $('#sellVal').textContent = `${fmtX(p)}  ${money(STAKE3 * (p - 1))}`;
+  drawBubble();
+  if (t >= S3.Tc + DC + 0.35) return finishBubble();
+  raf3 = requestAnimationFrame(loop3);
+}
+function sell3() {
+  if (!S3 || S3.phase !== 'run' || S3.sold !== null) return;
+  S3.sold = S3.cur; S3.soldT = S3.t; S3.phase = 'after';
+  const t = T();
+  $('#bSell').disabled = true; $('#sellLbl').textContent = t.soldLbl;
+  $('#sellVal').textContent = `${fmtX(S3.sold)}  ${money(STAKE3 * (S3.sold - 1))}`;
+  mood(S3.sold >= 1 ? 'happy' : 'sad');
+  say(pick(LINES3[LANG][S3.t > S3.Tc ? 'inCrash' : 'sold']));
+}
+function finishBubble() {
+  S3.phase = 'result'; cancelAnimationFrame(raf3);
+  const t = T(), x = bx(S3.b), Lp = LINES3[LANG];
+  const liquidated = S3.sold === null;
+  const exit = liquidated ? S3.bottom : S3.sold;
+  const gain = STAKE3 * (exit - 1);
+  const top = S3.top || S3.peak;
+  const captured = Math.round((exit - 1) / (top - 1) * 100);
+  const inCrash = !liquidated && S3.soldT > S3.Tc;
+  S3.pnl += gain;
+  S3.hist.push({ b: S3.b, exit, gain, top, captured, liquidated });
+  drawBubble(true);
+  const dEl = $('#delta'); dEl.textContent = money(gain); dEl.className = 'delta ' + (gain >= 0 ? 'up' : 'down');
+  $('#how').textContent = liquidated ? t.howLiq(fmtX(exit), fmtX(top)) : t.howSold(fmtX(exit), fmtX(top), captured);
+  $('#outcome').textContent = x.o;
+  $('#result').classList.add('on');
+  if (liquidated) { mood('panic'); say(pick(Lp.liq)); }
+  else if (inCrash) { mood('sad'); say(pick(Lp.inCrash)); }
+  else if (captured < 40) { mood('neutral'); say(pick(Lp.early)); }
+  else { mood('happy'); say(pick(Lp.good)); }
+  updateTop3();
+  if (!reduce) $('#pnl').animate([{ transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' });
+  $('#selling').classList.add('hide'); $('#bNext').classList.remove('hide');
+  const fill = $('#nextFill'); if (fill.getAnimations) fill.getAnimations().forEach(a => a.cancel()); fill.style.width = '0';
+  $('#nextTxt').textContent = S3.round + 1 >= ROUNDS3 ? t.seeEnd : t.nextBubble;
+  setTimeout(() => $('#result').scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' }), 150);
+}
+function drawBubble(final) {
+  if (!S3) return;
+  const t = T(), svg = $('#chart');
+  const target = Math.max(2.2, S3.peak * 1.18);
+  S3.yMax += (target - S3.yMax) * (final ? 1 : 0.12);
+  const X = v => 10 + (v / TMAX) * (W - 20), Y = p => H - 14 - (p / S3.yMax) * (H - 30);
+  let d = ''; S3.pts.forEach((q, i) => { d += (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1); });
+  const crashed = S3.t > S3.Tc;
+  const col = crashed ? 'var(--short)' : 'var(--long)';
+  const lbl = (x, y, txt, color) => { const anchor = x > W * 0.68 ? 'end' : 'start'; const tx = anchor === 'end' ? x - 8 : x + 8; return `<text x="${tx.toFixed(1)}" y="${Math.max(12, Math.min(H - 4, y)).toFixed(1)}" text-anchor="${anchor}" class="mark" style="fill:${color}">${txt}</text>`; };
+  let marks = '';
+  if (crashed && S3.top) { const px = X(S3.Tc), py = Y(S3.top); marks += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.5" fill="var(--ink)"/>` + lbl(px, py - 6, t.peakMark(fmtX(S3.top)), 'var(--ink)'); }
+  if (S3.sold !== null) { const sx = X(S3.soldT), sy = Y(S3.sold); marks += `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="5.5" fill="var(--ball)" stroke="var(--card)" stroke-width="2"/>` + lbl(sx, sy + 16, t.soldMark(fmtX(S3.sold)), 'var(--ink)'); }
+  const last = S3.pts[S3.pts.length - 1];
+  const y1 = Y(1);
+  svg.innerHTML = `
+    <line class="grid" x1="0" x2="${W}" y1="${H - 14}" y2="${H - 14}"/>
+    <line class="now" x1="0" x2="${W}" y1="${y1.toFixed(1)}" y2="${y1.toFixed(1)}" opacity=".6"/>
+    <text x="${W - 6}" y="${(y1 + 13).toFixed(1)}" text-anchor="end">${t.entry}</text>
+    ${d ? `<path class="post" d="${d}" stroke="${col}"/>` : ''}
+    ${last && S3.sold === null && !final ? `<circle cx="${X(last[0]).toFixed(1)}" cy="${Y(last[1]).toFixed(1)}" r="4" fill="${col}"/>` : ''}
+    ${marks}`;
+}
+function endGame3() {
+  S3.phase = 'end'; cancelAnimationFrame(raf3);
+  const t = T(), final = S3.pnl;
+  const rk = t.ranks3[final < 0 ? 0 : final < 5e6 ? 1 : final < 10e6 ? 2 : final < 15e6 ? 3 : 4];
+  const prev = store.get('best3', null), rec = prev === null || final > prev;
+  if (rec) store.set('best3', final);
+  const avg = Math.round(S3.hist.reduce((a, h) => a + Math.max(0, Math.min(100, h.captured)), 0) / S3.hist.length);
+  const crashes = S3.hist.filter(h => h.liquidated).length;
+  const bestH = S3.hist.reduce((a, h) => !a || h.gain > a.gain ? h : a, null);
+  const worstH = S3.hist.reduce((a, h) => !a || h.gain < a.gain ? h : a, null);
+  const md = final >= 0 ? 'happy' : 'panic'; mood(md);
+  openModal(`
+    <div class="hero">${pingSVG(md)}<div><div class="rank">${rk[0]}</div><div class="fine" style="margin-top:4px">${rk[1]}</div></div></div>
+    <div class="score ${final >= 0 ? 'up' : 'down'}">${money(final)}</div>
+    <div class="fine" style="margin-top:0">${rec ? t.newRecord : t.record(money(prev))}</div>
+    <div class="stats">
+      <div>${t.captAvg}<b>${avg}${LANG === 'fr' ? '\u00A0%' : '%'}</b></div>
+      <div>${t.crashes}<b>${t.goodV(crashes, S3.hist.length)}</b></div>
+      <div>${t.bestExit}<b>${bx(bestH.b).n} ${fmtX(bestH.exit)}</b></div>
+      <div>${t.worstB}<b>${bx(worstH.b).n} ${money(worstH.gain)}</b></div>
+    </div>
+    <button class="go" id="again3">${t.again3}</button>
+    <button class="alt" id="menu3">${t.menu}</button>
+    <p class="fine">${t.fine3}</p>`);
+  $('#again3').onclick = newGame3;
+  $('#menu3').onclick = () => { S3 = null; resetBoard(); intro(); };
+}
+
 // ---------- Commandes ----------
 $('#bShort').addEventListener('click', () => decide('short'));
 $('#bLong').addEventListener('click', () => decide('long'));
-$('#bNext').addEventListener('click', () => { if (S && S.phase === 'reveal') nextRound(); });
+$('#bNext').addEventListener('click', () => { if (MODE === 3 && S3 && S3.phase === 'result') nextBubble(); else if (S && S.phase === 'reveal') nextRound(); });
+$('#bSell').addEventListener('click', sell3);
 document.querySelectorAll('[data-k]').forEach(b => {
   const k = b.dataset.k;
   const on = e => { e.preventDefault(); rIn[k] = true; b.classList.add('on'); try { b.setPointerCapture(e.pointerId); } catch (_) {} };
@@ -1174,6 +1475,11 @@ const keyMap = { ArrowLeft: 'left', a: 'left', q: 'left', ArrowRight: 'right', d
 const racing = () => RS && !$('#race').classList.contains('hide');
 document.addEventListener('keydown', e => {
   if (racing()) { const k = keyMap[e.key]; if (k) { e.preventDefault(); rIn[k] = true; document.querySelector(`[data-k="${k}"]`).classList.add('on'); } return; }
+  if (MODE === 3 && S3 && !$('#modal').classList.contains('on')) {
+    if ((e.key === ' ' || e.key === 'ArrowDown' || e.key === 'Enter') && S3.phase === 'run') { e.preventDefault(); sell3(); }
+    else if ((e.key === 'Enter' || e.key === ' ') && S3.phase === 'result') { e.preventDefault(); nextBubble(); }
+    return;
+  }
   if (!S || $('#modal').classList.contains('on')) return;
   if (e.key === 'ArrowLeft') decide('short');
   else if (e.key === 'ArrowRight') decide('long');
@@ -1188,7 +1494,8 @@ $('#rQuit').addEventListener('click', () => { if (!RS) return; if (RS.state === 
 applyStatic();
 const qs = new URLSearchParams(location.search);
 if (qs.get('lang') === 'en' || qs.get('lang') === 'fr') setLang(qs.get('lang'));
-if (qs.get('niveau') === '2' || qs.get('level') === '2') raceIntro(); else intro();
+const lvl = qs.get('niveau') || qs.get('level');
+if (lvl === '2') raceIntro(); else if (lvl === '3') l3Intro(); else intro();
 })();
 </script>
 </body>
