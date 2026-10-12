@@ -122,8 +122,34 @@ button:focus-visible{outline:3px solid var(--ball);outline-offset:3px}
 .stats b{display:block;font-size:17px;color:var(--ink);margin-top:2px;line-height:1.2}
 .fca{border:2px solid var(--short);border-radius:16px;padding:12px 14px;margin:12px 0}
 .fca strong{color:var(--short)}
+
+/* ===== Niveau 2 : circuit ===== */
+.race{position:fixed;inset:0;z-index:40;background:#3F8040;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden}
+.race #rc{position:absolute;inset:0;width:100%;height:100%;display:block}
+.r-top{position:absolute;left:10px;right:10px;top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.nigel{display:flex;align-items:center;gap:8px;padding-right:52px}
+.nigel svg{width:54px;height:54px;flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.r-say{background:#fff;color:#14213D;border:2px solid #14213D;border-radius:16px 16px 16px 4px;padding:7px 12px;font-weight:800;font-size:16px;line-height:1.2;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.r-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.r-stats{display:flex;gap:6px}
+.r-stats div{background:rgba(20,33,61,.85);color:#FFF1E5;border-radius:12px;padding:5px 9px;font-size:11px;line-height:1.15;font-weight:600}
+.r-stats b{display:block;font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+#mini{width:118px;height:84px;background:rgba(20,33,61,.6);border-radius:12px;flex:none}
+.r-quit{position:absolute;right:10px;top:calc(env(safe-area-inset-top,0px) + 12px);width:44px;height:44px;border-radius:14px;border:0;background:rgba(20,33,61,.85);color:#fff;font-weight:800;font-size:15px;letter-spacing:1px}
+.r-count{position:absolute;left:0;right:0;top:38%;text-align:center;font-size:92px;font-weight:800;letter-spacing:-.03em;color:#fff;text-shadow:0 5px 0 rgba(0,0,0,.3);pointer-events:none}
+.r-ctrl{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.steer{display:flex;gap:10px}
+.r-btn{width:84px;height:84px;border-radius:24px;border:2px solid rgba(255,255,255,.6);background:rgba(20,33,61,.6);color:#fff;font-size:30px;font-weight:800;touch-action:none;-webkit-user-select:none;user-select:none}
+.r-btn.on{background:rgba(255,122,26,.9);border-color:#fff}
+.r-btn.brake{width:118px;font-size:22px;background:rgba(200,16,46,.65)}
+.r-btn.brake.on{background:#C8102E}
+@media (max-width:360px){.r-btn{width:72px;height:76px}.r-btn.brake{width:100px}}
 @media (max-height:700px){.name{font-size:24px}.teaser{font-size:14.5px}.ping{width:50px;height:50px}.big-btn{padding:12px 8px 10px;font-size:22px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 12px}
+.seg button{border:0;background:transparent;color:var(--ink);padding:8px 14px;font-size:14px;font-weight:700}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 </style>
 </head>
 <body>
@@ -141,13 +167,13 @@ button:focus-visible{outline:3px solid var(--ball);outline-offset:3px}
 <div id="app">
   <header class="top">
     <div>
-      <div class="lbl">Résultat de Ping</div>
+      <div class="lbl" data-i18n="pnlLbl">Résultat de Ping</div>
       <div class="pnl" id="pnl">£0</div>
     </div>
     <div class="round">
-      <div class="lbl">Opportunité</div>
+      <div class="lbl" data-i18n="roundLbl">Opportunité</div>
       <b id="roundNo">–</b>
-      <div class="limit" title="Limite de perte : 10 millions"><i id="limitBar"></i></div>
+      <div class="limit"><i id="limitBar"></i></div>
     </div>
   </header>
 
@@ -159,14 +185,14 @@ button:focus-visible{outline:3px solid var(--ball);outline-offset:3px}
         <path id="mouth" d="M42 73Q50 76 58 73" fill="none" stroke="#151B2C" stroke-width="3" stroke-linecap="round"/>
         <path id="sweat" d="M80 44c3 5 4 8 1.5 9.5S76 52 77 49z" fill="#7CC4FF" opacity="0"/>
       </svg>
-      <div class="say" id="say" aria-live="polite">Prêt quand tu l’es.</div>
+      <div class="say" id="say" aria-live="polite"></div>
     </div>
 
     <section class="deal" aria-live="polite">
       <div class="meta"><span class="date" id="date">–</span><span id="kind"></span></div>
-      <h1 class="name" id="name">La City vous attend</h1>
-      <p class="teaser" id="teaser">Douze opportunités du passé. Long si ça va monter, short si ça va baisser.</p>
-      <svg class="chart" id="chart" viewBox="0 0 320 168" role="img" aria-label="Graphique de cours illustratif"></svg>
+      <h1 class="name" id="name"></h1>
+      <p class="teaser" id="teaser"></p>
+      <svg class="chart" id="chart" viewBox="0 0 320 168" role="img"></svg>
       <div class="result" id="result">
         <div class="delta" id="delta"></div>
         <div class="how" id="how"></div>
@@ -177,95 +203,462 @@ button:focus-visible{outline:3px solid var(--ball);outline-offset:3px}
 
   <footer class="bottom">
     <div id="deciding">
-      <div class="stake"><span>Mise de Ping <small>(plus tu tardes, plus elle fond)</small></span><b id="stake">£3,0 M</b></div>
+      <div class="stake"><span><span data-i18n="stakeLbl">Mise de Ping</span> <small data-i18n="stakeHint"></small></span><b id="stake">£3,0 M</b></div>
       <div class="bar"><i id="timeBar"></i></div>
       <div class="btns">
-        <button class="big-btn b-short" id="bShort">↓ Short<small>ça va baisser</small></button>
-        <button class="big-btn b-long" id="bLong">↑ Long<small>ça va monter</small></button>
+        <button class="big-btn b-short" id="bShort">↓ <span data-i18n="short">Short</span><small data-i18n="shortSub"></small></button>
+        <button class="big-btn b-long" id="bLong">↑ <span data-i18n="long">Long</span><small data-i18n="longSub"></small></button>
       </div>
     </div>
-    <button class="next hide" id="bNext"><i id="nextFill"></i><span id="nextTxt">Suivant</span></button>
+    <button class="next hide" id="bNext"><i id="nextFill"></i><span id="nextTxt" data-i18n="next">Suivant</span></button>
   </footer>
+</div>
+
+<div id="race" class="race hide">
+  <canvas id="rc"></canvas>
+  <div class="r-top">
+    <div class="nigel">
+      <svg viewBox="0 0 60 60" aria-hidden="true">
+        <circle id="nSkin" cx="30" cy="33" r="21" fill="#F0C2A0"/>
+        <path d="M10 33c0-9 3-14 7-16-1 5-1 11 0 17zM50 33c0-9-3-14-7-16 1 5 1 11 0 17z" fill="#B9B9B9"/>
+        <path id="nBrows" d="M17 26l9 1M43 26l-9 1" stroke="#6E6E6E" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+        <circle cx="23" cy="32" r="2.2" fill="#1B1B1B"/><circle cx="37" cy="32" r="2.2" fill="#1B1B1B"/>
+        <path d="M19 42q11-6 22 0q-11 3-22 0z" fill="#9C9C9C"/>
+        <ellipse id="nMouth" cx="30" cy="47" rx="4" ry="1.6" fill="#5A1F1F"/>
+      </svg>
+      <div class="r-say" id="rSay" aria-live="polite"></div>
+    </div>
+    <div class="r-row">
+      <div class="r-stats"><div><span data-i18n="lap">Tour</span><b id="rLap">1 / 2</b></div><div><span data-i18n="time">Temps</span><b id="rTime">0</b></div><div><span data-i18n="unit">km/h</span><b id="rSpeed">0</b></div></div>
+      <canvas id="mini" width="236" height="168" aria-hidden="true"></canvas>
+    </div>
+  </div>
+  <button class="r-quit" id="rQuit" data-i18n-aria="pause">II</button>
+  <div class="r-count" id="rCount"></div>
+  <div class="r-ctrl">
+    <div class="steer"><button class="r-btn" data-k="left" data-i18n-aria="left">◀</button><button class="r-btn" data-k="right" data-i18n-aria="right">▶</button></div>
+    <button class="r-btn brake" data-k="brake" data-i18n="brake">Frein</button>
+  </div>
 </div>
 
 <div class="modal" id="modal"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 
 <script>
-(() => {
-// Cas réels, chiffres arrondis (variation approximative sur la période indiquée)
-const CARDS = [
-  { n: 'Northern Rock', k: 'Banque, Londres', d: 'Septembre 2007', m: -0.55, t: "La banque hypothécaire de Newcastle demande l’aide d’urgence de la Banque d’Angleterre. La BBC l’annonce en direct.", o: "Files d’attente devant les agences : première panique bancaire britannique depuis plus d’un siècle. Nationalisée en février 2008.", p: 'en deux jours' },
-  { n: 'Lehman Brothers', k: 'Banque, New York', d: 'Septembre 2008', m: -0.94, t: "Le Trésor américain refuse de la sauver et Barclays renonce à la racheter. Week-end de réunions à la Fed de New York.", o: "Faillite le lundi 15 septembre 2008, la plus grande de l’histoire américaine.", p: 'en une séance' },
-  { n: 'Volkswagen', k: 'Action, Francfort', d: 'Octobre 2008', m: 3.48, t: "Les hedge funds ont massivement vendu VW à découvert. Porsche révèle contrôler près de 75 % des actions ordinaires, options comprises.", o: "Short squeeze historique : VW devient brièvement la plus grosse capitalisation boursière du monde.", p: 'en deux séances' },
-  { n: 'BP', k: 'Pétrole, Londres', d: 'Avril 2010', m: -0.53, t: "Explosion de la plateforme Deepwater Horizon dans le golfe du Mexique. Le puits fuit au fond de la mer.", o: "La fuite dure près de trois mois. BP suspend son dividende.", p: 'en deux mois' },
-  { n: 'Royal Mail', k: 'Introduction en bourse, Londres', d: 'Octobre 2013', m: 0.38, ipo: true, t: "Le gouvernement privatise la poste britannique à 330 pence l’action. Les investisseurs se bousculent.", o: "Le gouvernement est accusé d’avoir bradé la poste.", p: 'le premier jour' },
-  { n: 'EUR/CHF', k: 'Devise', d: '15 janvier 2015', m: -0.15, t: "Depuis 2011, la BNS défend un cours plancher de 1,20 franc pour un euro. 10 h 30 : communiqué surprise.", o: "La BNS abandonne le plancher. Le franc s’envole, des courtiers font faillite dans la journée.", p: 'dans la journée' },
-  { n: 'Volkswagen', k: 'Action, Francfort', d: 'Septembre 2015', m: -0.35, t: "L’agence américaine de l’environnement accuse VW d’avoir truqué les tests d’émissions de ses moteurs diesel.", o: "Le dieselgate éclate, le patron démissionne dans la semaine.", p: 'en deux séances' },
-  { n: 'Livre sterling', k: 'Devise, GBP/USD', d: '23 juin 2016', m: -0.10, t: "Soir du référendum sur l’Union européenne. Les sondages donnent le maintien gagnant, la livre monte.", o: "Le Leave l’emporte. La livre tombe à son plus bas niveau depuis 1985.", p: 'dans la nuit' },
-  { n: 'Bitcoin', k: 'Crypto', d: 'Décembre 2017', m: -0.80, t: "Le bitcoin approche 20 000 dollars. Ton chauffeur de taxi te demande comment en acheter.", o: "L’hiver crypto : un an plus tard, il vaut environ 3 500 dollars.", p: 'en un an' },
-  { n: 'Carillion', k: 'BTP, Londres', d: 'Juillet 2017', m: -0.39, t: "Le géant des contrats publics britanniques publie un avertissement sur résultats. Le directeur général démissionne.", o: "Liquidation en janvier 2018, des chantiers publics restent en plan.", p: 'en une séance' },
-  { n: 'Boeing', k: 'Aéronautique, New York', d: 'Mars 2019', m: -0.11, t: "Deuxième accident d’un 737 MAX en cinq mois, en Éthiopie.", o: "Le 737 MAX est cloué au sol dans le monde entier pendant près de deux ans.", p: 'en deux séances' },
-  { n: 'Zoom', k: 'Tech, New York', d: 'Février 2020', m: 0.55, t: "Un nouveau virus se propage en Europe. Les entreprises préparent le télétravail.", o: "Confinements : réunions, cours et apéros, tout passe en visio.", p: 'en un mois' },
-  { n: 'Zoom', k: 'Tech, New York', d: '9 novembre 2020', m: -0.17, t: "Pfizer annonce un vaccin efficace à plus de 90 % contre le Covid.", o: "Les valeurs du confinement plongent dans la journée.", p: 'dans la journée' },
-  { n: 'Wirecard', k: 'Paiements, Francfort', d: 'Juin 2020', m: -0.97, t: "L’auditeur ne trouve pas 1,9 milliard d’euros censés être sur des comptes aux Philippines.", o: "Insolvabilité une semaine plus tard, le directeur général est arrêté.", p: 'en une semaine' },
-  { n: 'GameStop', k: 'Distribution, New York', d: 'Janvier 2021', m: 16.4, t: "Chaîne de magasins de jeux vidéo en déclin, une des actions les plus vendues à découvert de Wall Street. Un forum Reddit s’enflamme.", o: "Short squeeze géant. Des hedge funds perdent des milliards, des courtiers bloquent les achats.", p: 'en deux semaines' },
-  { n: 'ViacomCBS', k: 'Médias, New York', d: 'Mars 2021', m: -0.52, t: "Un family office très endetté, Archegos, détient des positions énormes sur ViacomCBS, qui lance une augmentation de capital.", o: "Archegos ne peut plus payer ses appels de marge : ventes forcées, et des banques perdent des milliards, dont Credit Suisse.", p: 'en une semaine' },
-  { n: 'Dogecoin', k: 'Crypto', d: 'Mai 2021', m: -0.30, t: "Elon Musk, qui fait grimper le Dogecoin depuis des mois, présente l’émission Saturday Night Live.", o: "Il plaisante à l’antenne sur une « arnaque » : la crypto chute pendant l’émission.", p: 'pendant l’émission' },
-  { n: 'Meta (Facebook)', k: 'Tech, New York', d: 'Février 2022', m: -0.26, t: "Pour la première fois, le nombre d’utilisateurs quotidiens de Facebook baisse.", o: "Plus grosse perte de valeur boursière en une séance pour une entreprise américaine à l’époque.", p: 'en une séance' },
-  { n: 'Netflix', k: 'Streaming, New York', d: 'Avril 2022', m: -0.35, t: "Netflix annonce sa première perte d’abonnés depuis plus de dix ans.", o: "Plus d’un tiers de la valeur part en fumée.", p: 'en une séance' },
-  { n: 'Livre sterling', k: 'Devise, GBP/USD', d: 'Septembre 2022', m: -0.08, t: "Le nouveau gouvernement annonce 45 milliards de livres de baisses d’impôts, sans financement.", o: "La livre touche son plus bas historique face au dollar. La Banque d’Angleterre intervient, Liz Truss tient 49 jours.", p: 'en trois séances' },
-  { n: 'Silicon Valley Bank', k: 'Banque, Californie', d: 'Mars 2023', m: -0.60, t: "La banque des start-up annonce une perte sur ses obligations et une levée de fonds d’urgence.", o: "Les clients retirent 42 milliards de dollars en une journée. Faillite le lendemain.", p: 'en une séance' },
-  { n: 'Credit Suisse', k: 'Banque, Zurich', d: 'Mars 2023', m: -0.55, t: "Week-end de crise à Berne : la Confédération, la BNS et la FINMA organisent le sauvetage.", o: "Rachat par UBS pour 3 milliards de francs. Les obligations AT1 sont effacées.", p: 'le lundi' },
-  { n: 'UBS', k: 'Banque, Zurich', d: 'Mars 2023', m: 0.50, t: "UBS rachète Credit Suisse pour 3 milliards de francs, avec des garanties de la Confédération.", o: "Les marchés saluent l’opération jusqu’à la fin de l’année.", p: 'en neuf mois' },
-  { n: 'Nvidia', k: 'Puces, New York', d: 'Mai 2023', m: 0.24, t: "Le fabricant de puces publie ses prévisions. ChatGPT a six mois et tout le monde veut entraîner des IA.", o: "Prévisions très au-dessus des attentes : quelques jours plus tard, Nvidia vaut 1 000 milliards de dollars.", p: 'en une séance' },
-  { n: 'Arm', k: 'Introduction en bourse, New York', d: 'Septembre 2023', m: 0.25, ipo: true, t: "Le concepteur britannique de puces, dont les plans équipent presque tous les smartphones, entre en bourse à 51 dollars.", o: "Les investisseurs se ruent sur le titre dès l’ouverture.", p: 'le premier jour' },
-  { n: 'Rolls-Royce', k: 'Moteurs d’avion, Londres', d: 'Janvier 2023', m: 2.2, t: "Le nouveau directeur général compare l’entreprise à une « plateforme en feu » devant ses employés.", o: "Le redressement fonctionne : meilleure performance du FTSE 100 sur l’année.", p: 'en un an' },
-  { n: 'Tesla', k: 'Automobile, New York', d: 'Janvier 2020', m: 7.4, t: "L’usine de Shanghai livre ses premières voitures et Tesla enchaîne les trimestres bénéficiaires.", o: "Envolée sur l’année, puis entrée dans l’indice S&P 500 en décembre.", p: 'en un an' },
-  { n: 'Moderna', k: 'Biotech, Nasdaq', d: 'Janvier 2020', m: 4.3, t: "Une biotech qui n’a jamais vendu un seul produit commence à travailler sur un vaccin contre un nouveau coronavirus.", o: "Son vaccin à ARN messager est autorisé en décembre 2020.", p: 'en un an' },
-  { n: 'Apple', k: 'Tech, Nasdaq', d: 'Janvier 2007', m: 1.36, t: "Steve Jobs présente un téléphone sans clavier, avec un écran tactile.", o: "L’iPhone sort en juin et l’action fait plus que doubler dans l’année.", p: 'en un an' },
-  { n: 'Nokia', k: 'Téléphonie, Helsinki', d: 'Fin 2007', m: -0.95, t: "Nokia vend environ quatre téléphones portables sur dix dans le monde et son action est au plus haut.", o: "Les smartphones balaient tout. En 2013, Nokia cède sa division mobile à Microsoft.", p: 'en cinq ans' },
-  { n: 'Facebook', k: 'Introduction en bourse, Nasdaq', d: 'Mai 2012', m: -0.54, ipo: true, t: "La plus grosse introduction en bourse de la tech de l’époque, à 38 dollars l’action.", o: "Couacs techniques le premier jour, doutes sur la publicité mobile : l’action est divisée par deux.", p: 'en quatre mois' },
-  { n: 'Swissair', k: 'Aviation, Zurich', d: 'Septembre 2001', m: -0.90, t: "La « banque volante » s’est lourdement endettée en achetant des participations dans des compagnies européennes.", o: "Grounding le 2 octobre 2001 : les avions restent au sol, faute d’argent pour payer le kérosène.", p: 'en quelques semaines' },
-  { n: 'Livre sterling', k: 'Devise, GBP/DEM', d: '16 septembre 1992', m: -0.12, t: "Londres veut garder la livre dans le Système monétaire européen et relève ses taux deux fois dans la journée. George Soros a une position énorme.", o: "La livre sort du système le soir même. Soros gagne environ un milliard de dollars.", p: 'en quelques semaines' },
-  { n: 'Bitcoin', k: 'Crypto', d: 'Octobre 2020', m: 4.5, t: "Le bitcoin vaut environ 11 000 dollars. Des sociétés cotées commencent à en mettre dans leur trésorerie.", o: "Il dépasse 60 000 dollars en avril 2021.", p: 'en six mois' },
-  { n: 'Microsoft', k: 'Tech, Nasdaq', d: 'Janvier 2023', m: 0.57, t: "Microsoft annonce un investissement de plusieurs milliards de dollars dans OpenAI, le créateur de ChatGPT.", o: "L’IA arrive dans tous ses produits, et dans son cours de bourse.", p: 'en un an' },
-  { n: 'Novo Nordisk', k: 'Pharma, Copenhague', d: 'Janvier 2023', m: 0.50, t: "Son médicament contre l’obésité, Wegovy, est en rupture de stock tellement la demande est forte.", o: "Novo devient la plus grosse capitalisation boursière d’Europe en septembre 2023.", p: 'en un an' },
-  { n: 'Peloton', k: 'Fitness, Nasdaq', d: 'Janvier 2021', m: -0.76, t: "Le vélo d’appartement connecté est la star du confinement. Les vaccins arrivent, les salles de sport vont rouvrir.", o: "Les ventes ralentissent, rappel de tapis de course : l’action perd les trois quarts de sa valeur.", p: 'en un an' },
-];
+// ===== Moteur de course (niveau 2) =====
+const RaceEngine = (() => {
+  const CP = [
+    [420,1460],[1000,1490],[1600,1470],[2040,1400],[2220,1170],[2140,940],[1900,870],
+    [1680,900],[1500,830],[1470,640],
+    [1620,500],[1900,430],[2090,260],[1880,95],[1380,120],
+    [980,230],[820,470],[960,700],[880,920],
+    [620,980],[390,910],[220,1060],[230,1320],
+  ];
+  const SP = 8, HW = 48, KO = 9, GR = 70;
+  const PHY = { vmax: 430, acc: 230, brake: 700, aMax: 520, wMax: 2.7, rMin: 55, scrub: 1.5, maxSlip: 1.0 };
+  const CRASH = HW + KO + 6;
+  const wrap = a => { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-const T = 7000, BASE = 1e6, FIRE = -10e6, ROUNDS = 12, FEE = 100e3;
+  function catmullClosed(P, seg) {
+    const n = P.length, out = [], d = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+    const L = (a, b, ta, tb, t) => [a[0] * (tb - t) / (tb - ta) + b[0] * (t - ta) / (tb - ta), a[1] * (tb - t) / (tb - ta) + b[1] * (t - ta) / (tb - ta)];
+    for (let i = 0; i < n; i++) {
+      const p0 = P[(i - 1 + n) % n], p1 = P[i], p2 = P[(i + 1) % n], p3 = P[(i + 2) % n];
+      const t0 = 0, t1 = t0 + Math.sqrt(d(p0, p1)), t2 = t1 + Math.sqrt(d(p1, p2)), t3 = t2 + Math.sqrt(d(p2, p3));
+      for (let k = 0; k < seg; k++) {
+        const t = t1 + (t2 - t1) * k / seg;
+        const A1 = L(p0, p1, t0, t1, t), A2 = L(p1, p2, t1, t2, t), A3 = L(p2, p3, t2, t3, t);
+        const B1 = L(A1, A2, t0, t2, t), B2 = L(A2, A3, t1, t3, t);
+        out.push(L(B1, B2, t1, t2, t));
+      }
+    }
+    return out;
+  }
+  function resample(pts, sp) {
+    const out = [pts[0]]; let acc = 0, prev = pts[0]; const n = pts.length;
+    for (let i = 1; i <= n; i++) {
+      const cur = pts[i % n]; let seg = Math.hypot(cur[0] - prev[0], cur[1] - prev[1]);
+      while (acc + seg >= sp) { const f = (sp - acc) / seg; const p = [prev[0] + (cur[0] - prev[0]) * f, prev[1] + (cur[1] - prev[1]) * f]; out.push(p); prev = p; seg = Math.hypot(cur[0] - prev[0], cur[1] - prev[1]); acc = 0; }
+      acc += seg; prev = cur;
+    }
+    if (Math.hypot(out[out.length - 1][0] - out[0][0], out[out.length - 1][1] - out[0][1]) < sp * 0.5) out.pop();
+    return out;
+  }
+
+  function buildTrack() {
+    let c = resample(catmullClosed(CP, 24), SP); const N = c.length;
+    // ligne de départ au milieu de la ligne droite du bas
+    let i0 = 0, bd = 1e18; c.forEach((p, i) => { const d = (p[0] - 900) ** 2 + (p[1] - 1488) ** 2; if (d < bd) { bd = d; i0 = i; } });
+    c = c.slice(i0).concat(c.slice(0, i0));
+    const x = c.map(p => p[0]), y = c.map(p => p[1]);
+    const tx = [], ty = [], nx = [], ny = [], k = [];
+    for (let i = 0; i < N; i++) {
+      const a = (i - 1 + N) % N, b = (i + 1) % N;
+      let dx = x[b] - x[a], dy = y[b] - y[a]; const l = Math.hypot(dx, dy); dx /= l; dy /= l;
+      tx.push(dx); ty.push(dy); nx.push(-dy); ny.push(dx);
+      const a1 = Math.atan2(y[i] - y[a], x[i] - x[a]), a2 = Math.atan2(y[b] - y[i], x[b] - x[i]);
+      k.push(wrap(a2 - a1) / SP);
+    }
+    const ks = k.map((_, i) => { let s = 0; for (let j = -3; j <= 3; j++) s += k[(i + j + N) % N]; return s / 7; });
+    const kerb = ks.map(v => Math.abs(v) > 1 / 380);
+    const kerbX = kerb.map((_, i) => { for (let j = -5; j <= 5; j++) if (kerb[(i + j + N) % N]) return true; return false; });
+    // vitesse sûre par point, puis propagation arrière pour savoir quand freiner
+    const safe = ks.map(v => Math.min(PHY.vmax, Math.sqrt(PHY.aMax * 0.9 / Math.max(Math.abs(v), 1e-4))));
+    const brakeAt = safe.slice();
+    for (let pass = 0; pass < 2; pass++) for (let i = N - 1; i >= 0; i--) {
+      const nxt = brakeAt[(i + 1) % N];
+      brakeAt[i] = Math.min(brakeAt[i], Math.sqrt(nxt * nxt + 2 * PHY.brake * 0.75 * SP));
+    }
+    return { N, x, y, tx, ty, nx, ny, ks, kerb: kerbX, safe, brakeAt, length: N * SP };
+  }
+
+  function nearest(T, px, py, idx) {
+    let best = idx, bd = 1e18;
+    for (let j = -16; j <= 16; j++) { const i = (idx + j + T.N) % T.N; const dx = px - T.x[i], dy = py - T.y[i]; const d = dx * dx + dy * dy; if (d < bd) { bd = d; best = i; } }
+    return best;
+  }
+  function lateral(T, px, py, i) { return (px - T.x[i]) * T.nx[i] + (py - T.y[i]) * T.ny[i]; }
+
+  function newCar(T) {
+    const th = Math.atan2(T.ty[0], T.tx[0]);
+    const back = 10; // départ juste derrière la ligne
+    return { x: T.x[(T.N - back) % T.N], y: T.y[(T.N - back) % T.N], th, ph: th, v: 0, steer: 0, slip: 0, idx: (T.N - back) % T.N, lat: 0, lap: 0, half: false, crashed: false, kerb: false };
+  }
+
+  function step(T, car, inp, dt) {
+    car.steer += clamp(inp.steer - car.steer, -7 * dt, 7 * dt);
+    if (inp.brake) car.v = Math.max(0, car.v - PHY.brake * dt);
+    else if (inp.go !== false) car.v = Math.min(PHY.vmax, car.v + PHY.acc * dt * (1 - 0.5 * car.v / PHY.vmax));
+    const w = car.steer * Math.min(PHY.wMax, car.v / PHY.rMin);
+    car.th += w * dt;
+    let diff = wrap(car.th - car.ph);
+    const rate = PHY.aMax / Math.max(car.v, 30);
+    car.ph += clamp(diff, -rate * dt, rate * dt);
+    diff = wrap(car.th - car.ph);
+    if (Math.abs(diff) > PHY.maxSlip) { car.th = car.ph + Math.sign(diff) * PHY.maxSlip; diff = Math.sign(diff) * PHY.maxSlip; }
+    car.slip = Math.abs(Math.sin(diff));
+    car.v -= car.v * car.slip * PHY.scrub * dt;
+    car.x += Math.cos(car.ph) * car.v * dt; car.y += Math.sin(car.ph) * car.v * dt;
+    const prev = car.idx;
+    car.idx = nearest(T, car.x, car.y, car.idx);
+    car.lat = lateral(T, car.x, car.y, car.idx);
+    const a = Math.abs(car.lat);
+    car.kerb = a > HW && T.kerb[car.idx];
+    if (car.idx > T.N * 0.4 && car.idx < T.N * 0.6) car.half = true;
+    if (car.half && prev > T.N - 40 && car.idx < 40) { car.lap++; car.half = false; car.lapped = true; } else car.lapped = false;
+    car.wrongWay = (Math.cos(car.ph) * T.tx[car.idx] + Math.sin(car.ph) * T.ty[car.idx]) < -0.3 && car.v > 40;
+    if (a > CRASH) car.crashed = true;
+    return car;
+  }
+
+  // Pilote automatique (sert aux tests)
+  function autopilot(T, car, digital = true) {
+    const look = 9 + Math.round(car.v / 60);
+    const j = (car.idx + look) % T.N;
+    const ang = wrap(Math.atan2(T.y[j] - car.y, T.x[j] - car.x) - car.th);
+    let steer = clamp(ang * 3, -1, 1);
+    if (digital) steer = Math.abs(ang) < 0.04 ? 0 : Math.sign(ang);
+    let minB = 1e9; for (let s = 2; s < 12; s++) minB = Math.min(minB, T.brakeAt[(car.idx + s) % T.N]);
+    return { steer, brake: car.v > minB };
+  }
+
+  return { buildTrack, newCar, step, autopilot, nearest, lateral, PHY, HW, KO, GR, SP, CRASH, wrap, clamp };
+})();
+</script>
+<script>
+(() => {
 const $ = s => document.querySelector(s);
-const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const store = {
   get(k, d) { try { const v = localStorage.getItem('ping:' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem('ping:' + k, JSON.stringify(v)); } catch (e) {} },
 };
-let best = store.get('best', null);
-let S = null, raf = 0, nextTimer = 0;
+let LANG = store.get('lang', null) || ((navigator.language || 'fr').toLowerCase().startsWith('fr') ? 'fr' : 'en');
+
+// ---------- Cas réels (chiffres arrondis) : [nom, type, date, accroche, dénouement, période] ----------
+const C = (m, ipo, fr, en) => ({ m, ipo, id: fr[0] + '|' + fr[2], fr, en });
+const CARDS = [
+  C(-0.55, false,
+    ['Northern Rock', 'Banque, Londres', 'Septembre 2007', 'La banque hypothécaire de Newcastle demande l’aide d’urgence de la Banque d’Angleterre. La BBC l’annonce en direct.', 'Files d’attente devant les agences : première panique bancaire britannique depuis plus d’un siècle. Nationalisée en février 2008.', 'en deux jours'],
+    ['Northern Rock', 'Bank, London', 'September 2007', 'The Newcastle mortgage lender asks the Bank of England for emergency support. The BBC breaks the news live.', 'Queues outside the branches: the first run on a British bank in over a century. Nationalised in February 2008.', 'in two days']),
+  C(-0.94, false,
+    ['Lehman Brothers', 'Banque, New York', 'Septembre 2008', 'Le Trésor américain refuse de la sauver et Barclays renonce à la racheter. Week-end de réunions à la Fed de New York.', 'Faillite le lundi 15 septembre 2008, la plus grande de l’histoire américaine.', 'en une séance'],
+    ['Lehman Brothers', 'Bank, New York', 'September 2008', 'The US Treasury refuses to bail it out and Barclays walks away from a takeover. Weekend of meetings at the New York Fed.', 'Files for bankruptcy on Monday 15 September 2008, the largest in US history.', 'in one session']),
+  C(3.48, false,
+    ['Volkswagen', 'Action, Francfort', 'Octobre 2008', 'Les hedge funds ont massivement vendu VW à découvert. Porsche révèle contrôler près de 75 % des actions ordinaires, options comprises.', 'Short squeeze historique : VW devient brièvement la plus grosse capitalisation boursière du monde.', 'en deux séances'],
+    ['Volkswagen', 'Stock, Frankfurt', 'October 2008', 'Hedge funds are heavily short Volkswagen. Porsche reveals it controls almost 75% of the ordinary shares, options included.', 'Historic short squeeze: VW briefly becomes the world’s most valuable listed company.', 'in two sessions']),
+  C(-0.53, false,
+    ['BP', 'Pétrole, Londres', 'Avril 2010', 'Explosion de la plateforme Deepwater Horizon dans le golfe du Mexique. Le puits fuit au fond de la mer.', 'La fuite dure près de trois mois. BP suspend son dividende.', 'en deux mois'],
+    ['BP', 'Oil, London', 'April 2010', 'The Deepwater Horizon rig explodes in the Gulf of Mexico. The well is leaking on the seabed.', 'The leak lasts almost three months. BP suspends its dividend.', 'in two months']),
+  C(0.38, true,
+    ['Royal Mail', 'Introduction en bourse, Londres', 'Octobre 2013', 'Le gouvernement privatise la poste britannique à 330 pence l’action. Les investisseurs se bousculent.', 'Le gouvernement est accusé d’avoir bradé la poste.', 'le premier jour'],
+    ['Royal Mail', 'IPO, London', 'October 2013', 'The government privatises the British postal service at 330 pence a share. Investors pile in.', 'The government is accused of selling the Royal Mail on the cheap.', 'on day one']),
+  C(-0.15, false,
+    ['EUR/CHF', 'Devise', '15 janvier 2015', 'Depuis 2011, la BNS défend un cours plancher de 1,20 franc pour un euro. 10 h 30 : communiqué surprise.', 'La BNS abandonne le plancher. Le franc s’envole, des courtiers font faillite dans la journée.', 'dans la journée'],
+    ['EUR/CHF', 'Currency', '15 January 2015', 'Since 2011, the Swiss National Bank has defended a floor of 1.20 francs per euro. 10:30 am: surprise statement.', 'The SNB scraps the floor. The franc soars and some brokers go bust within the day.', 'within the day']),
+  C(-0.35, false,
+    ['Volkswagen', 'Action, Francfort', 'Septembre 2015', 'L’agence américaine de l’environnement accuse VW d’avoir truqué les tests d’émissions de ses moteurs diesel.', 'Le dieselgate éclate, le patron démissionne dans la semaine.', 'en deux séances'],
+    ['Volkswagen', 'Stock, Frankfurt', 'September 2015', 'The US environmental agency accuses VW of rigging emissions tests on its diesel engines.', 'Dieselgate erupts and the CEO resigns within the week.', 'in two sessions']),
+  C(-0.10, false,
+    ['Livre sterling', 'Devise, GBP/USD', '23 juin 2016', 'Soir du référendum sur l’Union européenne. Les sondages donnent le maintien gagnant, la livre monte.', 'Le Leave l’emporte. La livre tombe à son plus bas niveau depuis 1985.', 'dans la nuit'],
+    ['Pound sterling', 'Currency, GBP/USD', '23 June 2016', 'Referendum night on EU membership. Polls point to Remain and sterling is rising.', 'Leave wins. The pound falls to its lowest level since 1985.', 'overnight']),
+  C(-0.80, false,
+    ['Bitcoin', 'Crypto', 'Décembre 2017', 'Le bitcoin approche 20 000 dollars. Ton chauffeur de taxi te demande comment en acheter.', 'L’hiver crypto : un an plus tard, il vaut environ 3 500 dollars.', 'en un an'],
+    ['Bitcoin', 'Crypto', 'December 2017', 'Bitcoin is nearing $20,000. Your cab driver asks you how to buy some.', 'Crypto winter: a year later it trades at around $3,500.', 'in a year']),
+  C(-0.39, false,
+    ['Carillion', 'BTP, Londres', 'Juillet 2017', 'Le géant des contrats publics britanniques publie un avertissement sur résultats. Le directeur général démissionne.', 'Liquidation en janvier 2018, des chantiers publics restent en plan.', 'en une séance'],
+    ['Carillion', 'Construction, London', 'July 2017', 'The UK public-contracts giant issues a profit warning. The chief executive steps down.', 'Liquidation in January 2018, leaving public projects stranded.', 'in one session']),
+  C(-0.11, false,
+    ['Boeing', 'Aéronautique, New York', 'Mars 2019', 'Deuxième accident d’un 737 MAX en cinq mois, en Éthiopie.', 'Le 737 MAX est cloué au sol dans le monde entier pendant près de deux ans.', 'en deux séances'],
+    ['Boeing', 'Aerospace, New York', 'March 2019', 'A second 737 MAX crash in five months, in Ethiopia.', 'The 737 MAX is grounded worldwide for almost two years.', 'in two sessions']),
+  C(0.55, false,
+    ['Zoom', 'Tech, New York', 'Février 2020', 'Un nouveau virus se propage en Europe. Les entreprises préparent le télétravail.', 'Confinements : réunions, cours et apéros, tout passe en visio.', 'en un mois'],
+    ['Zoom', 'Tech, New York', 'February 2020', 'A new virus is spreading in Europe. Companies get ready for remote work.', 'Lockdowns: meetings, classes and drinks all move to video calls.', 'in a month']),
+  C(-0.17, false,
+    ['Zoom', 'Tech, New York', '9 novembre 2020', 'Pfizer annonce un vaccin efficace à plus de 90 % contre le Covid.', 'Les valeurs du confinement plongent dans la journée.', 'dans la journée'],
+    ['Zoom', 'Tech, New York', '9 November 2020', 'Pfizer announces a Covid vaccine more than 90% effective.', 'Lockdown stocks plunge within the day.', 'within the day']),
+  C(-0.97, false,
+    ['Wirecard', 'Paiements, Francfort', 'Juin 2020', 'L’auditeur ne trouve pas 1,9 milliard d’euros censés être sur des comptes aux Philippines.', 'Insolvabilité une semaine plus tard, le directeur général est arrêté.', 'en une semaine'],
+    ['Wirecard', 'Payments, Frankfurt', 'June 2020', 'The auditor cannot find €1.9 billion supposedly held in accounts in the Philippines.', 'Insolvency a week later; the CEO is arrested.', 'in a week']),
+  C(16.4, false,
+    ['GameStop', 'Distribution, New York', 'Janvier 2021', 'Chaîne de magasins de jeux vidéo en déclin, une des actions les plus vendues à découvert de Wall Street. Un forum Reddit s’enflamme.', 'Short squeeze géant. Des hedge funds perdent des milliards, des courtiers bloquent les achats.', 'en deux semaines'],
+    ['GameStop', 'Retail, New York', 'January 2021', 'A declining video-game retailer, one of the most shorted stocks on Wall Street. A Reddit forum catches fire.', 'Giant short squeeze. Hedge funds lose billions and some brokers restrict buying.', 'in two weeks']),
+  C(-0.52, false,
+    ['ViacomCBS', 'Médias, New York', 'Mars 2021', 'Un family office très endetté, Archegos, détient des positions énormes sur ViacomCBS, qui lance une augmentation de capital.', 'Archegos ne peut plus payer ses appels de marge : ventes forcées, et des banques perdent des milliards, dont Credit Suisse.', 'en une semaine'],
+    ['ViacomCBS', 'Media, New York', 'March 2021', 'A highly leveraged family office, Archegos, holds huge positions in ViacomCBS, which launches a share sale.', 'Archegos can no longer meet its margin calls: fire sales, and banks lose billions, Credit Suisse among them.', 'in a week']),
+  C(-0.30, false,
+    ['Dogecoin', 'Crypto', 'Mai 2021', 'Elon Musk, qui fait grimper le Dogecoin depuis des mois, présente l’émission Saturday Night Live.', 'Il plaisante à l’antenne sur une « arnaque » : la crypto chute pendant l’émission.', 'pendant l’émission'],
+    ['Dogecoin', 'Crypto', 'May 2021', 'Elon Musk, who has been talking up Dogecoin for months, hosts Saturday Night Live.', 'He jokes on air that it’s a “hustle”: the coin drops during the show.', 'during the show']),
+  C(-0.26, false,
+    ['Meta (Facebook)', 'Tech, New York', 'Février 2022', 'Pour la première fois, le nombre d’utilisateurs quotidiens de Facebook baisse.', 'Plus grosse perte de valeur boursière en une séance pour une entreprise américaine à l’époque.', 'en une séance'],
+    ['Meta (Facebook)', 'Tech, New York', 'February 2022', 'For the first time, Facebook’s daily user count falls.', 'The biggest one-day loss in market value for a US company at the time.', 'in one session']),
+  C(-0.35, false,
+    ['Netflix', 'Streaming, New York', 'Avril 2022', 'Netflix annonce sa première perte d’abonnés depuis plus de dix ans.', 'Plus d’un tiers de la valeur part en fumée.', 'en une séance'],
+    ['Netflix', 'Streaming, New York', 'April 2022', 'Netflix reports its first subscriber loss in more than ten years.', 'More than a third of its value goes up in smoke.', 'in one session']),
+  C(-0.08, false,
+    ['Livre sterling', 'Devise, GBP/USD', 'Septembre 2022', 'Le nouveau gouvernement annonce 45 milliards de livres de baisses d’impôts, sans financement.', 'La livre touche son plus bas historique face au dollar. La Banque d’Angleterre intervient, Liz Truss tient 49 jours.', 'en trois séances'],
+    ['Pound sterling', 'Currency, GBP/USD', 'September 2022', 'The new government announces £45 billion of unfunded tax cuts.', 'The pound hits a record low against the dollar. The Bank of England steps in; Liz Truss lasts 49 days.', 'in three sessions']),
+  C(-0.60, false,
+    ['Silicon Valley Bank', 'Banque, Californie', 'Mars 2023', 'La banque des start-up annonce une perte sur ses obligations et une levée de fonds d’urgence.', 'Les clients retirent 42 milliards de dollars en une journée. Faillite le lendemain.', 'en une séance'],
+    ['Silicon Valley Bank', 'Bank, California', 'March 2023', 'The start-up bank reports a loss on its bonds and an emergency capital raise.', 'Customers withdraw $42 billion in a single day. It fails the next day.', 'in one session']),
+  C(-0.55, false,
+    ['Credit Suisse', 'Banque, Zurich', 'Mars 2023', 'Week-end de crise à Berne : la Confédération, la BNS et la FINMA organisent le sauvetage.', 'Rachat par UBS pour 3 milliards de francs. Les obligations AT1 sont effacées.', 'le lundi'],
+    ['Credit Suisse', 'Bank, Zurich', 'March 2023', 'Crisis weekend in Bern: the Swiss government, the SNB and FINMA organise a rescue.', 'Taken over by UBS for 3 billion francs. The AT1 bonds are wiped out.', 'on Monday']),
+  C(0.50, false,
+    ['UBS', 'Banque, Zurich', 'Mars 2023', 'UBS rachète Credit Suisse pour 3 milliards de francs, avec des garanties de la Confédération.', 'Les marchés saluent l’opération jusqu’à la fin de l’année.', 'en neuf mois'],
+    ['UBS', 'Bank, Zurich', 'March 2023', 'UBS buys Credit Suisse for 3 billion francs, with government guarantees.', 'Markets cheer the deal all the way to the end of the year.', 'in nine months']),
+  C(0.24, false,
+    ['Nvidia', 'Puces, New York', 'Mai 2023', 'Le fabricant de puces publie ses prévisions. ChatGPT a six mois et tout le monde veut entraîner des IA.', 'Prévisions très au-dessus des attentes : quelques jours plus tard, Nvidia vaut 1 000 milliards de dollars.', 'en une séance'],
+    ['Nvidia', 'Chips, New York', 'May 2023', 'The chipmaker publishes its outlook. ChatGPT is six months old and everyone wants to train AI models.', 'Guidance far above expectations: days later, Nvidia is worth $1 trillion.', 'in one session']),
+  C(0.25, true,
+    ['Arm', 'Introduction en bourse, New York', 'Septembre 2023', 'Le concepteur britannique de puces, dont les plans équipent presque tous les smartphones, entre en bourse à 51 dollars.', 'Les investisseurs se ruent sur le titre dès l’ouverture.', 'le premier jour'],
+    ['Arm', 'IPO, New York', 'September 2023', 'The British chip designer, whose designs power almost every smartphone, lists at $51 a share.', 'Investors pile in from the opening bell.', 'on day one']),
+  C(2.2, false,
+    ['Rolls-Royce', 'Moteurs d’avion, Londres', 'Janvier 2023', 'Le nouveau directeur général compare l’entreprise à une « plateforme en feu » devant ses employés.', 'Le redressement fonctionne : meilleure performance du FTSE 100 sur l’année.', 'en un an'],
+    ['Rolls-Royce', 'Aero engines, London', 'January 2023', 'The new chief executive tells staff the company is a “burning platform”.', 'The turnaround works: best performer in the FTSE 100 for the year.', 'in a year']),
+  C(7.4, false,
+    ['Tesla', 'Automobile, New York', 'Janvier 2020', 'L’usine de Shanghai livre ses premières voitures et Tesla enchaîne les trimestres bénéficiaires.', 'Envolée sur l’année, puis entrée dans l’indice S&P 500 en décembre.', 'en un an'],
+    ['Tesla', 'Carmaker, New York', 'January 2020', 'The Shanghai plant delivers its first cars and Tesla strings together profitable quarters.', 'A stellar year, capped by entry into the S&P 500 in December.', 'in a year']),
+  C(4.3, false,
+    ['Moderna', 'Biotech, Nasdaq', 'Janvier 2020', 'Une biotech qui n’a jamais vendu un seul produit commence à travailler sur un vaccin contre un nouveau coronavirus.', 'Son vaccin à ARN messager est autorisé en décembre 2020.', 'en un an'],
+    ['Moderna', 'Biotech, Nasdaq', 'January 2020', 'A biotech that has never sold a single product starts working on a vaccine against a new coronavirus.', 'Its mRNA vaccine is authorised in December 2020.', 'in a year']),
+  C(1.36, false,
+    ['Apple', 'Tech, Nasdaq', 'Janvier 2007', 'Steve Jobs présente un téléphone sans clavier, avec un écran tactile.', 'L’iPhone sort en juin et l’action fait plus que doubler dans l’année.', 'en un an'],
+    ['Apple', 'Tech, Nasdaq', 'January 2007', 'Steve Jobs unveils a phone with no keyboard and a touchscreen.', 'The iPhone launches in June and the stock more than doubles that year.', 'in a year']),
+  C(-0.95, false,
+    ['Nokia', 'Téléphonie, Helsinki', 'Fin 2007', 'Nokia vend environ quatre téléphones portables sur dix dans le monde et son action est au plus haut.', 'Les smartphones balaient tout. En 2013, Nokia cède sa division mobile à Microsoft.', 'en cinq ans'],
+    ['Nokia', 'Mobile phones, Helsinki', 'Late 2007', 'Nokia sells roughly four in ten mobile phones worldwide and its share price is at a peak.', 'Smartphones sweep everything away. In 2013, Nokia sells its phone business to Microsoft.', 'in five years']),
+  C(-0.54, true,
+    ['Facebook', 'Introduction en bourse, Nasdaq', 'Mai 2012', 'La plus grosse introduction en bourse de la tech de l’époque, à 38 dollars l’action.', 'Couacs techniques le premier jour, doutes sur la publicité mobile : l’action est divisée par deux.', 'en quatre mois'],
+    ['Facebook', 'IPO, Nasdaq', 'May 2012', 'The biggest tech IPO of its time, at $38 a share.', 'Glitches on day one and doubts about mobile advertising: the stock halves.', 'in four months']),
+  C(-0.90, false,
+    ['Swissair', 'Aviation, Zurich', 'Septembre 2001', 'La « banque volante » s’est lourdement endettée en achetant des participations dans des compagnies européennes.', 'Grounding le 2 octobre 2001 : les avions restent au sol, faute d’argent pour payer le kérosène.', 'en quelques semaines'],
+    ['Swissair', 'Airline, Zurich', 'September 2001', 'The “flying bank” has piled up debt buying stakes in European airlines.', 'Grounding on 2 October 2001: the planes stay on the ground, with no cash left to pay for fuel.', 'in a few weeks']),
+  C(-0.12, false,
+    ['Livre sterling', 'Devise, GBP/DEM', '16 septembre 1992', 'Londres veut garder la livre dans le mécanisme de change européen et relève ses taux deux fois dans la journée. George Soros a une position énorme.', 'La livre sort du mécanisme le soir même. Soros gagne environ un milliard de dollars.', 'en quelques semaines'],
+    ['Pound sterling', 'Currency, GBP/DEM', '16 September 1992', 'London wants to keep sterling in the European Exchange Rate Mechanism and raises rates twice in one day. George Soros has a huge position.', 'Sterling crashes out of the mechanism that evening. Soros makes around a billion dollars.', 'in a few weeks']),
+  C(4.5, false,
+    ['Bitcoin', 'Crypto', 'Octobre 2020', 'Le bitcoin vaut environ 11 000 dollars. Des sociétés cotées commencent à en mettre dans leur trésorerie.', 'Il dépasse 60 000 dollars en avril 2021.', 'en six mois'],
+    ['Bitcoin', 'Crypto', 'October 2020', 'Bitcoin is worth about $11,000. Listed companies start putting it on their balance sheets.', 'It tops $60,000 in April 2021.', 'in six months']),
+  C(0.57, false,
+    ['Microsoft', 'Tech, Nasdaq', 'Janvier 2023', 'Microsoft annonce un investissement de plusieurs milliards de dollars dans OpenAI, le créateur de ChatGPT.', 'L’IA arrive dans tous ses produits, et dans son cours de bourse.', 'en un an'],
+    ['Microsoft', 'Tech, Nasdaq', 'January 2023', 'Microsoft announces a multibillion-dollar investment in OpenAI, the maker of ChatGPT.', 'AI lands in all its products, and in its share price.', 'in a year']),
+  C(0.50, false,
+    ['Novo Nordisk', 'Pharma, Copenhague', 'Janvier 2023', 'Son médicament contre l’obésité, Wegovy, est en rupture de stock tellement la demande est forte.', 'Novo devient la plus grosse capitalisation boursière d’Europe en septembre 2023.', 'en un an'],
+    ['Novo Nordisk', 'Pharma, Copenhagen', 'January 2023', 'Its obesity drug Wegovy is out of stock because demand is so strong.', 'Novo becomes Europe’s most valuable listed company in September 2023.', 'in a year']),
+  C(-0.76, false,
+    ['Peloton', 'Fitness, Nasdaq', 'Janvier 2021', 'Le vélo d’appartement connecté est la star du confinement. Les vaccins arrivent, les salles de sport vont rouvrir.', 'Les ventes ralentissent, rappel de tapis de course : l’action perd les trois quarts de sa valeur.', 'en un an'],
+    ['Peloton', 'Fitness, Nasdaq', 'January 2021', 'The connected exercise bike is the star of lockdown. Vaccines are coming and gyms will reopen.', 'Sales slow and a treadmill recall follows: the stock loses three quarters of its value.', 'in a year']),
+];
+const tx = c => { const a = c[LANG]; return { n: a[0], k: a[1], d: a[2], t: a[3], o: a[4], p: a[5] }; };
+
+// ---------- Textes ----------
+const STR = {
+  fr: {
+    title: 'Ping, trader à Londres', pnlLbl: 'Résultat de Ping', roundLbl: 'Opportunité', limit: 'Limite de perte : 10 millions',
+    stakeLbl: 'Mise de Ping', stakeHint: '(plus tu tardes, plus elle fond)',
+    short: 'Short', shortSub: 'ça va baisser', long: 'Long', longSub: 'ça va monter',
+    next: 'Suivant', seeEnd: 'Voir le bilan', boss: 'Le patron veut te voir…',
+    ready: 'Prêt quand tu l’es.', idleName: 'La City vous attend', idleTeaser: 'Douze opportunités du passé. Long si ça va monter, short si ça va baisser.',
+    now: 'maintenant', ipo: 'prix d’introduction', chartAria: 'Graphique de cours illustratif',
+    how: (side, stake, p, per) => `${side} avec ${stake} : ${p} ${per}`,
+    howNone: (side, p, per) => `Pas de décision. Il fallait jouer ${side} : ${p} ${per}`,
+    squeeze: 'Short squeeze ! Ça monte sans plafond !', phone: 'Mon téléphone vibre…',
+    tipFrom: 'WhatsApp, 22 h 47, Kevin (fusions-acquisitions)',
+    tipMsg: 'Psst Ping. Demain matin on annonce le rachat de <b>Brexford Biscuits plc</b> avec 40 % de prime. Personne ne le sait encore 🤫 Tu achètes ce soir ?',
+    tipTake: 'J’achète discrètement', tipRefuse: 'Je préviens la compliance',
+    tipTaken: '+£4 M sur Brexford. Personne ne saura jamais…', tipRefused: 'La compliance m’offre un mug. Kevin passe une mauvaise journée.',
+    fca: '<strong>Le lendemain, 7 h 02 : la FCA saisit le téléphone de Ping.</strong><br>Les messages avec Kevin sont sur la table. Gains confisqués, amende, interdiction d’exercer. Au Royaume-Uni, le délit d’initié est une infraction pénale, en plus des sanctions de la FCA pour abus de marché.',
+    ranks: { banned: ['Interdit d’exercer', 'Ping vend désormais des parapluies à Leadenhall Market.'], fired: ['Viré', 'Ping range ses affaires dans un carton. Nigel ne lève même pas les yeux.'], neg: ['Stagiaire, encore un an', 'Nigel est déçu, mais il a vu pire.'], r1: ['Analyste junior', 'Correct. Ping garde son badge.'], r2: ['Trader confirmé', 'Le bonus paiera les vacances à Mykonos.'], r3: ['Chef de desk', 'Ping a désormais une place réservée au pub.'], r4: ['Légende de la City', 'On parlera de cette journée à Canary Wharf pendant des années.'] },
+    newRecord: 'Nouveau record personnel.', record: v => `Record : ${v}`,
+    good: 'Bons choix', goodV: (a, b) => `${a} sur ${b}`, compliance: 'Compliance', mug: 'Un mug offert', file: 'Dossier ouvert', nothing: 'Rien à signaler', bestT: 'Meilleur coup', worstT: 'Pire coup',
+    lesson: 'Leçon de Nigel : en short, la perte n’a pas de plafond. Une action ne peut pas baisser de plus de 100&nbsp;%, mais elle peut monter de 1&nbsp;000&nbsp;%.',
+    keys: 'Pas mal, Ping. Tiens, les clés de ma Racing Car. Une rayure et tu es viré.',
+    toL2win: 'Niveau 2 : conduire la Racing Car', again1: 'Rejouer le niveau 1', again: 'Rejouer',
+    fine: 'Cas réels, chiffres arrondis, graphiques illustratifs. Ceci n’est pas un conseil en investissement, Nigel non plus.',
+    sub: 'Trader à Londres',
+    introP: 'Nigel, le patron du desk, te confie douze opportunités tirées de l’histoire des marchés. Tu as sept secondes pour chacune.',
+    rules: [['l', '↑ Long', 'Tu achètes : tu gagnes si ça monte.'], ['s', '↓ Short', 'Tu vends à découvert : tu gagnes si ça baisse. Mais si ça monte, la perte n’a pas de limite.'], ['o', 'Vitesse', 'Décide vite, tu mises jusqu’à 3 millions. Hésite, la mise fond jusqu’à 1 million. Sans décision, tu paies des frais.'], ['n', '−£10 M', 'Au-delà de 10 millions de pertes, Ping est viré.']],
+    l1: 'Niveau 1 : la salle des marchés', l2: 'Niveau 2 : la Racing Car de Nigel',
+    yourRecord: v => `Ton record au niveau 1 : ${v}`, yourRace: v => `Ton record au niveau 2 : ${v}`,
+    keysHint: 'Raccourcis clavier : ← short, → long, Entrée pour passer à la suite.', langLbl: 'Langue',
+    // course
+    lap: 'Tour', time: 'Temps', unit: 'km/h', unitK: 0.72, brake: 'Frein', left: 'Tourner à gauche', right: 'Tourner à droite', pause: 'Pause', go: 'Partez !',
+    rTitle: 'Niveau 2 : la Racing Car de Nigel',
+    rP: 'Nigel te prête sa Racing Car pour deux tours de circuit. Il s’assoit à côté de toi. Il va crier.',
+    rRules: [['o', 'Auto', 'La voiture accélère toute seule.'], ['n', '◀ ▶', 'Tu tournes avec les flèches, à gauche de l’écran.'], ['s', 'Frein', 'Freine avant les virages serrés, pas pendant.'], ['n', 'Gravier', 'Si tu pars dans le gravier, c’est fini. Les vibreurs rouges et blancs sont tolérés, Nigel beaucoup moins.']],
+    rGo: 'Prendre le volant', menu: 'Retour au menu', rKeys: 'Au clavier : ← → pour tourner, ↓ ou espace pour freiner.',
+    rHello: 'Ma Racing Car. Mon bébé. Ne fais pas l’idiot.',
+    crashT: '<strong>Dans le gravier.</strong><br>Nigel : « Tu me dois une Racing Car. Je la retiens sur ton bonus jusqu’en 2047. »',
+    crashLap: 'Tu avais pourtant bouclé un tour.', crashNoLap: 'Tu n’as même pas bouclé un tour.', crashTip: 'Astuce : freine en ligne droite, avant le virage, puis tourne.',
+    retry: 'Réessayer', finT: 'Pas une rayure !', stars3: 'Trois étoiles sous 48 secondes.',
+    finQ: ['Lent comme un lundi matin. Mais ma voiture est entière.', 'Propre. Un peu lent, mais propre.', 'Tu conduis mieux que tu ne trades. Ne le répète à personne.'],
+    nigelSays: q => `Nigel : « ${q} »`, again2: 'Rejouer le niveau 2',
+    pauseT: 'Pause', pause1: 'Nigel attend, le moteur tourne.', pause2: 'Nigel tapote nerveusement le tableau de bord.', resume: 'Reprendre',
+  },
+  en: {
+    title: 'Ping, trader in London', pnlLbl: 'Ping’s P&L', roundLbl: 'Opportunity', limit: 'Loss limit: 10 million',
+    stakeLbl: 'Ping’s stake', stakeHint: '(the longer you wait, the more it shrinks)',
+    short: 'Short', shortSub: 'it will fall', long: 'Long', longSub: 'it will rise',
+    next: 'Next', seeEnd: 'See the results', boss: 'The boss wants to see you…',
+    ready: 'Ready when you are.', idleName: 'The City awaits', idleTeaser: 'Twelve opportunities from the past. Long if it will rise, short if it will fall.',
+    now: 'now', ipo: 'IPO price', chartAria: 'Illustrative price chart',
+    how: (side, stake, p, per) => `${side} with ${stake}: ${p} ${per}`,
+    howNone: (side, p, per) => `No decision. You should have gone ${side}: ${p} ${per}`,
+    squeeze: 'Short squeeze! There’s no ceiling!', phone: 'My phone is buzzing…',
+    tipFrom: 'WhatsApp, 10:47 pm, Kevin (M&A)',
+    tipMsg: 'Psst Ping. Tomorrow morning we announce the takeover of <b>Brexford Biscuits plc</b> at a 40% premium. Nobody knows yet 🤫 Buying tonight?',
+    tipTake: 'I’ll buy quietly', tipRefuse: 'I’ll tell compliance',
+    tipTaken: '+£4m on Brexford. Nobody will ever know…', tipRefused: 'Compliance gives me a mug. Kevin is having a bad day.',
+    fca: '<strong>Next day, 7:02 am: the FCA seizes Ping’s phone.</strong><br>The messages with Kevin are on the table. Profits confiscated, a fine, a ban from the industry. In the UK, insider dealing is a criminal offence, on top of FCA sanctions for market abuse.',
+    ranks: { banned: ['Banned from the industry', 'Ping now sells umbrellas in Leadenhall Market.'], fired: ['Fired', 'Ping packs his things into a cardboard box. Nigel doesn’t even look up.'], neg: ['Intern, one more year', 'Nigel is disappointed, but he has seen worse.'], r1: ['Junior analyst', 'Decent. Ping keeps his badge.'], r2: ['Trader', 'The bonus will pay for Mykonos.'], r3: ['Head of desk', 'Ping now has a reserved seat at the pub.'], r4: ['Legend of the City', 'Canary Wharf will talk about this day for years.'] },
+    newRecord: 'New personal best.', record: v => `Best: ${v}`,
+    good: 'Good calls', goodV: (a, b) => `${a} out of ${b}`, compliance: 'Compliance', mug: 'A free mug', file: 'Case opened', nothing: 'Nothing to report', bestT: 'Best trade', worstT: 'Worst trade',
+    lesson: 'Nigel’s lesson: when you’re short, losses have no ceiling. A stock can’t fall more than 100%, but it can rise 1,000%.',
+    keys: 'Not bad, Ping. Here are the keys to my Racing Car. One scratch and you’re fired.',
+    toL2win: 'Level 2: drive the Racing Car', again1: 'Play level 1 again', again: 'Play again',
+    fine: 'Real cases, rounded figures, illustrative charts. This is not investment advice, and neither is Nigel.',
+    sub: 'Trader in London',
+    introP: 'Nigel, the head of the desk, hands you twelve opportunities from market history. You have seven seconds for each.',
+    rules: [['l', '↑ Long', 'You buy: you win if it goes up.'], ['s', '↓ Short', 'You sell short: you win if it goes down. But if it goes up, the loss has no limit.'], ['o', 'Speed', 'Decide fast and you bet up to 3 million. Hesitate and the stake shrinks to 1 million. No decision costs you fees.'], ['n', '−£10m', 'Lose more than 10 million and Ping is fired.']],
+    l1: 'Level 1: the trading floor', l2: 'Level 2: Nigel’s Racing Car',
+    yourRecord: v => `Your level 1 best: ${v}`, yourRace: v => `Your level 2 best: ${v}`,
+    keysHint: 'Keyboard: ← short, → long, Enter for next.', langLbl: 'Language',
+    lap: 'Lap', time: 'Time', unit: 'mph', unitK: 0.45, brake: 'Brake', left: 'Steer left', right: 'Steer right', pause: 'Pause', go: 'Go!',
+    rTitle: 'Level 2: Nigel’s Racing Car',
+    rP: 'Nigel lends you his Racing Car for two laps of the circuit. He sits next to you. He will shout.',
+    rRules: [['o', 'Auto', 'The car accelerates on its own.'], ['n', '◀ ▶', 'Steer with the arrows on the left of the screen.'], ['s', 'Brake', 'Brake before tight corners, not in them.'], ['n', 'Gravel', 'Go into the gravel and it’s over. The red and white kerbs are tolerated. Nigel, much less so.']],
+    rGo: 'Take the wheel', menu: 'Back to menu', rKeys: 'Keyboard: ← → to steer, ↓ or space to brake.',
+    rHello: 'My Racing Car. My baby. Don’t be an idiot.',
+    crashT: '<strong>In the gravel.</strong><br>Nigel: “You owe me a Racing Car. It’s coming out of your bonus until 2047.”',
+    crashLap: 'You had completed a lap, though.', crashNoLap: 'You didn’t even complete a lap.', crashTip: 'Tip: brake in a straight line, before the corner, then turn.',
+    retry: 'Try again', finT: 'Not a scratch!', stars3: 'Three stars under 48 seconds.',
+    finQ: ['Slow as a Monday morning. But my car is in one piece.', 'Clean. A bit slow, but clean.', 'You drive better than you trade. Don’t tell anyone I said that.'],
+    nigelSays: q => `Nigel: “${q}”`, again2: 'Play level 2 again',
+    pauseT: 'Pause', pause1: 'Nigel is waiting, engine running.', pause2: 'Nigel drums nervously on the dashboard.', resume: 'Resume',
+  },
+};
+const T = () => STR[LANG];
+
+const LINES = {
+  fr: {
+    start: ['Vite, le marché n’attend pas.', 'Nigel me regarde, je le sens.', 'Ça sent le coup.', 'Concentration, Ping.', 'Un café, un trade.', 'Je le sens bien, celui-là.'],
+    win: ['Champagne au bar ce soir !', 'Ping, génie de la City.', 'Le bonus approche.', 'Trop facile.', 'Nigel a souri. Je crois.'],
+    smallLoss: ['Aïe.', 'C’était un test.', 'Personne n’a rien vu.', 'On se refait au prochain.'],
+    bigLoss: ['Ping transpire.', 'Ne dites rien à Nigel.', 'Je… je vais prendre l’air.', 'Mon bonus vient de s’évaporer.'],
+    late: ['J’ai hésité. Le client est parti.', 'Trop lent. Frais de dossier quand même.'],
+  },
+  en: {
+    start: ['Quick, the market won’t wait.', 'Nigel is watching me, I can feel it.', 'I smell a trade.', 'Focus, Ping.', 'One coffee, one trade.', 'Good feeling about this one.'],
+    win: ['Champagne at the pub tonight!', 'Ping, genius of the City.', 'Bonus incoming.', 'Too easy.', 'Nigel smiled. I think.'],
+    smallLoss: ['Ouch.', 'That was a test.', 'Nobody saw that.', 'I’ll make it back on the next one.'],
+    bigLoss: ['Ping is sweating.', 'Don’t tell Nigel.', 'I… I need some air.', 'My bonus just evaporated.'],
+    late: ['I hesitated. The client left.', 'Too slow. Still paying the fees.'],
+  },
+};
+const LINES2 = {
+  fr: {
+    start: ['Tu la rayes, tu la paies.', 'Elle vaut plus que ton appartement, Ping.', 'Les deux mains sur le volant. LES DEUX.'],
+    brake: ['FREINE !', 'FREINE, PING !!', 'LE VIRAGE ! LE VIRAGE !', 'Tu vas beaucoup trop vite, là !'],
+    slip: ['ÇA GLISSE !!', 'MES PNEUS NEUFS !', 'Arrête de faire le malin !'],
+    kerb: ['PAS LES VIBREURS ! LES JANTES !', 'Les bordures, Ping ! Les bordures !'],
+    edge: ['RESTE SUR LE BITUME !!', 'Le gravier, Ping ! LE GRAVIER !'],
+    wrong: ['C’est dans l’autre sens, génie.', 'DEMI-TOUR !'],
+    slow: ['Lâche ce frein. Ma grand-mère roule plus vite.', 'On n’est pas au supermarché, avance !'],
+    calm: ['Hmm.', 'Pas mal…', 'Garde ta trajectoire.', 'Respire. Moi aussi.', 'Ne prends pas la grosse tête.'],
+    lap: ['Un tour. Encore un, sans faire l’idiot.', 'Dernier tour. Concentre-toi.'],
+    crash: ['MA RACING CAR !!! DANS LE GRAVIER !!!', 'NOOON ! MA VOITURE !!!'],
+    finish: ['…Bon. Tu peux garder ton badge.', 'Pas une rayure. Je suis presque fier.'],
+  },
+  en: {
+    start: ['You scratch it, you pay for it.', 'It’s worth more than your flat, Ping.', 'Both hands on the wheel. BOTH.'],
+    brake: ['BRAKE!', 'BRAKE, PING!!', 'THE CORNER! THE CORNER!', 'You’re going way too fast!'],
+    slip: ['IT’S SLIDING!!', 'MY NEW TYRES!', 'Stop showing off!'],
+    kerb: ['NOT THE KERBS! THE WHEELS!', 'The kerbs, Ping! The kerbs!'],
+    edge: ['STAY ON THE TARMAC!!', 'The gravel, Ping! THE GRAVEL!'],
+    wrong: ['It’s the other way, genius.', 'TURN AROUND!'],
+    slow: ['Let go of that brake. My gran drives faster.', 'This isn’t the supermarket car park. Move!'],
+    calm: ['Hmm.', 'Not bad…', 'Keep your line.', 'Breathe. Me too.', 'Don’t get a big head.'],
+    lap: ['One lap. One more, no funny business.', 'Last lap. Concentrate.'],
+    crash: ['MY RACING CAR!!! IN THE GRAVEL!!!', 'NOOO! MY CAR!!!'],
+    finish: ['…Fine. You can keep your badge.', 'Not a scratch. I’m almost proud.'],
+  },
+};
 
 // ---------- Formats ----------
-const nf1 = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-const nf0 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+const T_ = 7000, BASE = 1e6, FIRE = -10e6, ROUNDS = 12, FEE = 100e3;
+const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+let best = store.get('best', null);
+let S = null, raf = 0, nextTimer = 0;
+const fmt = (v, d) => new Intl.NumberFormat(LANG === 'fr' ? 'fr-FR' : 'en-GB', { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
 function money(x, sign = true) {
   const a = Math.abs(x);
-  const v = a >= 1e6 ? nf1.format(a / 1e6) + '\u00A0M' : nf0.format(Math.round(a / 1e3)) + '\u00A0k';
   if (a < 500) return '£0';
+  const v = LANG === 'fr'
+    ? (a >= 1e6 ? fmt(a / 1e6, 1) + '\u00A0M' : fmt(Math.round(a / 1e3), 0) + '\u00A0k')
+    : (a >= 1e6 ? fmt(a / 1e6, 1) + 'm' : fmt(Math.round(a / 1e3), 0) + 'k');
   return (sign ? (x < 0 ? '−' : '+') : '') + '£' + v;
 }
-const pct = m => (m >= 0 ? '+' : '−') + nf0.format(Math.round(Math.abs(m) * 100)) + '\u00A0%';
+const pct = m => (m >= 0 ? '+' : '−') + fmt(Math.round(Math.abs(m) * 100), 0) + (LANG === 'fr' ? '\u00A0%' : '%');
+const fmtTime = t => fmt(t, 1) + '\u00A0s';
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = a => a[(Math.random() * a.length) | 0];
 const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
+// ---------- Langue ----------
+function applyStatic() {
+  const t = T();
+  document.documentElement.lang = LANG;
+  document.title = t.title;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t[el.dataset.i18n]; });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t[el.dataset.i18nAria]));
+  $('.limit').title = t.limit;
+  $('#chart').setAttribute('aria-label', t.chartAria);
+  if (!S) { $('#name').textContent = t.idleName; $('#teaser').textContent = t.idleTeaser; say(t.ready); drawChart({ ipo: false }); }
+}
+function setLang(l) { LANG = l; store.set('lang', l); applyStatic(); }
+
 // ---------- Ping ----------
-const LINES = {
-  start: ['Vite, le marché n’attend pas.', 'Nigel me regarde, je le sens.', 'Ça sent le coup.', 'Concentration, Ping.', 'Un café, un trade.', 'Je le sens bien, celui-là.'],
-  win: ['Champagne au bar ce soir !', 'Ping, génie de la City.', 'Le bonus approche.', 'Trop facile.', 'Nigel a souri. Je crois.'],
-  smallLoss: ['Aïe.', 'C’était un test.', 'Personne n’a rien vu.', 'On se refait au prochain.'],
-  bigLoss: ['Ping transpire.', 'Ne dites rien à Nigel.', 'Je… je vais prendre l’air.', 'Mon bonus vient de s’évaporer.'],
-  late: ['J’ai hésité. Le client est parti.', 'Trop lent. Frais de dossier quand même.'],
-};
 const MOUTH = {
   neutral: 'M42 73Q50 76 58 73',
   happy: 'M37 70Q50 85 63 70',
@@ -284,7 +677,7 @@ function mood(m) {
     if (m === 'panic') f.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }], { duration: 260, iterations: 2 });
   }
 }
-const say = t => { $('#say').textContent = t; };
+function say(t) { $('#say').textContent = t; }
 const pingSVG = (md = 'happy') => { const r = md === 'panic' ? 5.6 : 4.3; return `<svg class="ping" viewBox="0 0 100 100" aria-hidden="true"><use href="#pingArt"/><circle cx="40" cy="60" r="${r}" fill="#151B2C"/><circle cx="60" cy="60" r="${r}" fill="#151B2C"/><path d="${MOUTH[md]}" fill="${md === 'panic' ? '#151B2C' : 'none'}" stroke="#151B2C" stroke-width="3" stroke-linecap="round"/>${md === 'panic' || md === 'sad' ? '<path d="M80 44c3 5 4 8 1.5 9.5S76 52 77 49z" fill="#7CC4FF"/>' : ''}</svg>`; };
 
 // ---------- Graphique (illustratif, échelle logarithmique) ----------
@@ -318,25 +711,23 @@ function drawChart(card) {
     <line class="grid" x1="0" x2="${W}" y1="30" y2="30"/><line class="grid" x1="0" x2="${W}" y1="150" y2="150"/>
     <line class="now" x1="${XNOW}" x2="${XNOW}" y1="4" y2="${H - 4}"/>
     <line class="now" x1="0" x2="${W}" y1="${Y0}" y2="${Y0}" opacity=".5"/>
-    <text x="${XNOW + 5}" y="14">maintenant</text>
-    ${card.ipo ? `<text x="8" y="${Y0 - 8}">prix d’introduction</text>` : ''}
+    <text x="${XNOW + 5}" y="14">${T().now}</text>
+    ${card.ipo ? `<text x="8" y="${Y0 - 8}">${T().ipo}</text>` : ''}
     <path class="pre" d="${prePath(card)}"/>`;
 }
 function revealChart(card) {
   const pts = postPoints(card.m);
   const color = card.m >= 0 ? 'var(--long)' : 'var(--short)';
   const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
-  const svg = $('#chart');
-  const NS = 'http://www.w3.org/2000/svg';
+  const svg = $('#chart'), NS = 'http://www.w3.org/2000/svg';
   const path = document.createElementNS(NS, 'path');
   path.setAttribute('class', 'post'); path.setAttribute('d', d); path.setAttribute('stroke', color);
   svg.appendChild(path);
   const end = pts[pts.length - 1];
   const out = end[1] < 8 || end[1] > H - 8;
-  const ly = card.m >= 0 ? H - 12 : 40;
   const txt = document.createElementNS(NS, 'text');
-  txt.setAttribute('x', W - 8); txt.setAttribute('y', ly); txt.setAttribute('text-anchor', 'end');
-  txt.setAttribute('class', 'big'); txt.setAttribute('fill', color); txt.style.fill = color;
+  txt.setAttribute('x', W - 8); txt.setAttribute('y', card.m >= 0 ? H - 12 : 40); txt.setAttribute('text-anchor', 'end');
+  txt.setAttribute('class', 'big'); txt.style.fill = color;
   txt.textContent = (out ? (card.m >= 0 ? '↑ ' : '↓ ') : '') + pct(card.m);
   if (!reduce) {
     const len = path.getTotalLength();
@@ -348,25 +739,23 @@ function revealChart(card) {
   } else svg.appendChild(txt);
 }
 
-// ---------- Partie ----------
+// ---------- Niveau 1 ----------
 function dealCards() {
   const recent = new Set(store.get('recent', []));
   const longs = shuffle(CARDS.filter(c => c.m > 0)), shorts = shuffle(CARDS.filter(c => c.m < 0));
-  const fresh = a => a.sort((x, y) => recent.has(x.n + x.d) - recent.has(y.n + y.d));
+  const fresh = a => a.sort((x, y) => recent.has(x.id) - recent.has(y.id));
   fresh(longs); fresh(shorts);
   const nl = 4 + ((Math.random() * 4) | 0);
   const hand = shuffle([...longs.slice(0, nl), ...shorts.slice(0, ROUNDS - nl)]);
-  store.set('recent', hand.map(c => c.n + c.d));
+  store.set('recent', hand.map(c => c.id));
   return hand;
 }
-
 function newGame() {
   closeModal();
   S = { cards: dealCards(), round: -1, pnl: 0, hist: [], insiderAt: 3 + ((Math.random() * 6) | 0), insider: null, phase: 'idle' };
   updateTop();
   nextRound();
 }
-
 function updateTop() {
   const el = $('#pnl');
   el.textContent = money(S ? S.pnl : 0);
@@ -374,48 +763,45 @@ function updateTop() {
   $('#roundNo').textContent = S && S.round >= 0 ? `${Math.min(S.round + 1, ROUNDS)} / ${ROUNDS}` : '–';
   $('#limitBar').style.width = S ? Math.min(100, Math.max(0, -S.pnl / -FIRE * 100)) + '%' : '0';
 }
-
 function nextRound() {
   clearTimeout(nextTimer);
   if (S.pnl <= FIRE) return endGame('fired');
   if (S.round + 1 >= ROUNDS) return endGame();
   if (S.round + 1 === S.insiderAt && S.insider === null) return insiderTip();
   S.round++;
-  const c = S.cards[S.round];
+  const c = S.cards[S.round], x = tx(c);
   S.phase = 'decide';
-  $('#date').textContent = c.d; $('#kind').textContent = c.k; $('#name').textContent = c.n; $('#teaser').textContent = c.t;
+  $('#date').textContent = x.d; $('#kind').textContent = x.k; $('#name').textContent = x.n; $('#teaser').textContent = x.t;
   $('#result').classList.remove('on');
   drawChart(c);
   $('#deciding').classList.remove('hide'); $('#bNext').classList.add('hide');
-  mood('neutral'); say(pick(LINES.start));
+  mood('neutral'); say(pick(LINES[LANG].start));
   updateTop();
   S.t0 = performance.now();
   cancelAnimationFrame(raf);
   const tick = now => {
     if (S.phase !== 'decide') return;
-    const el = now - S.t0, f = Math.max(0, 1 - el / T);
+    const el = now - S.t0, f = Math.max(0, 1 - el / T_);
     $('#stake').textContent = money(BASE * (1 + 2 * f), false);
     $('#timeBar').style.width = (f * 100) + '%';
-    if (el >= T) return decide(null);
+    if (el >= T_) return decide(null);
     raf = requestAnimationFrame(tick);
   };
   raf = requestAnimationFrame(tick);
 }
-
 function decide(side) {
   if (!S || S.phase !== 'decide') return;
   S.phase = 'reveal';
   cancelAnimationFrame(raf);
-  const c = S.cards[S.round];
-  const el = performance.now() - S.t0;
-  const mult = 1 + 2 * Math.max(0, 1 - el / T);
+  const c = S.cards[S.round], x = tx(c), t = T();
+  const mult = 1 + 2 * Math.max(0, 1 - (performance.now() - S.t0) / T_);
   let delta, how;
   if (side) {
     delta = BASE * mult * c.m * (side === 'long' ? 1 : -1);
-    how = `${side === 'long' ? 'Long' : 'Short'} avec ${money(BASE * mult, false)} : ${pct(c.m)} ${c.p}`;
+    how = t.how(side === 'long' ? t.long : t.short, money(BASE * mult, false), pct(c.m), x.p);
   } else {
     delta = -FEE;
-    how = `Pas de décision. Il fallait jouer ${c.m > 0 ? 'long' : 'short'} : ${pct(c.m)} ${c.p}`;
+    how = t.howNone((c.m > 0 ? t.long : t.short).toLowerCase(), pct(c.m), x.p);
   }
   const correct = !!side && (c.m > 0) === (side === 'long');
   S.pnl += delta;
@@ -423,83 +809,87 @@ function decide(side) {
   revealChart(c);
   const dEl = $('#delta');
   dEl.textContent = money(delta); dEl.className = 'delta ' + (delta >= 0 ? 'up' : 'down');
-  $('#how').textContent = how; $('#outcome').textContent = c.o;
+  $('#how').textContent = how; $('#outcome').textContent = x.o;
   $('#result').classList.add('on');
-  if (!side) { mood('sad'); say(pick(LINES.late)); }
-  else if (delta >= 0) { mood('happy'); say(pick(LINES.win)); }
-  else if (delta < -3e6) { mood('panic'); say(side === 'short' && c.m > 1 ? 'Short squeeze ! Ça monte sans plafond !' : pick(LINES.bigLoss)); }
-  else { mood('sad'); say(pick(LINES.smallLoss)); }
+  const Lp = LINES[LANG];
+  if (!side) { mood('sad'); say(pick(Lp.late)); }
+  else if (delta >= 0) { mood('happy'); say(pick(Lp.win)); }
+  else if (delta < -3e6) { mood('panic'); say(side === 'short' && c.m > 1 ? t.squeeze : pick(Lp.bigLoss)); }
+  else { mood('sad'); say(pick(Lp.smallLoss)); }
   updateTop();
   if (!reduce) $('#pnl').animate([{ transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' });
   $('#deciding').classList.add('hide');
-  const nb = $('#bNext'); nb.classList.remove('hide');
+  $('#bNext').classList.remove('hide');
   const last = S.round + 1 >= ROUNDS || S.pnl <= FIRE;
-  $('#nextTxt').textContent = S.pnl <= FIRE ? 'Le patron veut te voir…' : last ? 'Voir le bilan' : 'Suivant';
-  const fill = $('#nextFill');
-  const wait = 5200;
-  fill.getAnimations && fill.getAnimations().forEach(a => a.cancel());
+  $('#nextTxt').textContent = S.pnl <= FIRE ? t.boss : last ? t.seeEnd : t.next;
+  const fill = $('#nextFill'), wait = 5200;
+  if (fill.getAnimations) fill.getAnimations().forEach(a => a.cancel());
   if (!reduce) fill.animate([{ width: '0%' }, { width: '100%' }], { duration: wait, easing: 'linear', fill: 'forwards' });
   nextTimer = setTimeout(nextRound, wait);
   setTimeout(() => $('#result').scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' }), 200);
 }
-
-// ---------- Tuyau d'initié ----------
 function insiderTip() {
+  const t = T();
   S.phase = 'insider';
-  mood('neutral'); say('Mon téléphone vibre…');
+  mood('neutral'); say(t.phone);
   openModal(`
-    <div class="from">WhatsApp, 22 h 47, Kevin (fusions-acquisitions)</div>
-    <div class="msg">Psst Ping. Demain matin on annonce le rachat de <b>Brexford Biscuits plc</b> avec 40 % de prime. Personne ne le sait encore 🤫 Tu achètes ce soir ?</div>
-    <button class="go" id="takeTip">J’achète discrètement</button>
-    <button class="alt" id="refuseTip">Je préviens la compliance</button>`);
-  $('#takeTip').onclick = () => {
-    S.insider = 'taken'; S.pnl += 4e6;
-    closeModal(); mood('happy'); say('+£4 M sur Brexford. Personne ne saura jamais…'); updateTop();
-    setTimeout(nextRound, 1400);
-  };
-  $('#refuseTip').onclick = () => {
-    S.insider = 'refused';
-    closeModal(); mood('happy'); say('La compliance m’offre un mug. Kevin passe une mauvaise journée.');
-    setTimeout(nextRound, 1400);
-  };
+    <div class="from">${t.tipFrom}</div>
+    <div class="msg">${t.tipMsg}</div>
+    <button class="go" id="takeTip">${t.tipTake}</button>
+    <button class="alt" id="refuseTip">${t.tipRefuse}</button>`);
+  $('#takeTip').onclick = () => { S.insider = 'taken'; S.pnl += 4e6; closeModal(); mood('happy'); say(t.tipTaken); updateTop(); setTimeout(nextRound, 1400); };
+  $('#refuseTip').onclick = () => { S.insider = 'refused'; closeModal(); mood('happy'); say(t.tipRefused); setTimeout(nextRound, 1400); };
 }
-
-// ---------- Fin ----------
 function endGame(reason) {
+  const t = T();
   S.phase = 'end';
   clearTimeout(nextTimer); cancelAnimationFrame(raf);
-  let final = S.pnl, rank, line;
+  let final = S.pnl, rk;
   const banned = S.insider === 'taken';
-  if (banned) { final = Math.min(S.pnl - 4e6, 0) - 2e6; rank = 'Interdit d’exercer'; line = 'Ping vend désormais des parapluies à Leadenhall Market.'; }
-  else if (reason === 'fired') { rank = 'Viré'; line = 'Ping range ses affaires dans un carton. Nigel ne lève même pas les yeux.'; }
-  else if (final < 0) { rank = 'Stagiaire, encore un an'; line = 'Nigel est déçu, mais il a vu pire.'; }
-  else if (final < 5e6) { rank = 'Analyste junior'; line = 'Correct. Ping garde son badge.'; }
-  else if (final < 20e6) { rank = 'Trader confirmé'; line = 'Le bonus paiera les vacances à Mykonos.'; }
-  else if (final < 50e6) { rank = 'Chef de desk'; line = 'Ping a désormais une place réservée au pub.'; }
-  else { rank = 'Légende de la City'; line = 'On parlera de cette journée à Canary Wharf pendant des années.'; }
+  if (banned) { final = Math.min(S.pnl - 4e6, 0) - 2e6; rk = t.ranks.banned; }
+  else if (reason === 'fired') rk = t.ranks.fired;
+  else if (final < 0) rk = t.ranks.neg;
+  else if (final < 5e6) rk = t.ranks.r1;
+  else if (final < 20e6) rk = t.ranks.r2;
+  else if (final < 50e6) rk = t.ranks.r3;
+  else rk = t.ranks.r4;
   const ok = S.hist.filter(h => h.correct).length;
   const bestT = S.hist.reduce((a, h) => !a || h.delta > a.delta ? h : a, null);
   const worstT = S.hist.reduce((a, h) => !a || h.delta < a.delta ? h : a, null);
+  const success = !banned && reason !== 'fired' && final > 0;
   const isRecord = best === null || final > best;
   if (isRecord) { best = final; store.set('best', best); }
   const squeeze = worstT && worstT.side === 'short' && worstT.c.m > 1 && worstT.delta < -3e6;
   const endMood = final >= 0 ? 'happy' : (reason === 'fired' || banned ? 'panic' : 'sad');
   mood(endMood);
   openModal(`
-    ${banned ? `<div class="fca"><strong>Le lendemain, 7 h 02 : la FCA saisit le téléphone de Ping.</strong><br>Les messages avec Kevin sont sur la table. Gains confisqués, amende, interdiction d’exercer. Au Royaume-Uni, le délit d’initié est une infraction pénale, en plus des sanctions de la FCA pour abus de marché.</div>` : ''}
-    <div class="hero">${pingSVG(endMood)}<div><div class="rank">${rank}</div><div class="fine" style="margin-top:4px">${line}</div></div></div>
+    ${banned ? `<div class="fca">${t.fca}</div>` : ''}
+    <div class="hero">${pingSVG(endMood)}<div><div class="rank">${rk[0]}</div><div class="fine" style="margin-top:4px">${rk[1]}</div></div></div>
     <div class="score ${final >= 0 ? 'up' : 'down'}">${money(final)}</div>
-    <div class="fine" style="margin-top:0">${isRecord ? 'Nouveau record personnel.' : `Record : ${money(best)}`}</div>
+    <div class="fine" style="margin-top:0">${isRecord ? t.newRecord : t.record(money(best))}</div>
     <div class="stats">
-      <div>Bons choix<b>${ok} sur ${S.hist.length}</b></div>
-      <div>Compliance<b>${S.insider === 'refused' ? 'Un mug offert' : banned ? 'Dossier ouvert' : 'Rien à signaler'}</b></div>
-      ${bestT ? `<div>Meilleur coup<b>${bestT.c.n} ${money(bestT.delta)}</b></div>` : ''}
-      ${worstT ? `<div>Pire coup<b>${worstT.c.n} ${money(worstT.delta)}</b></div>` : ''}
+      <div>${t.good}<b>${t.goodV(ok, S.hist.length)}</b></div>
+      <div>${t.compliance}<b>${S.insider === 'refused' ? t.mug : banned ? t.file : t.nothing}</b></div>
+      ${bestT ? `<div>${t.bestT}<b>${tx(bestT.c).n} ${money(bestT.delta)}</b></div>` : ''}
+      ${worstT ? `<div>${t.worstT}<b>${tx(worstT.c).n} ${money(worstT.delta)}</b></div>` : ''}
     </div>
-    ${squeeze ? `<p>Leçon de Nigel : en short, la perte n’a pas de plafond. Une action ne peut pas baisser de plus de 100 %, mais elle peut monter de 1&nbsp;000&nbsp;%.</p>` : ''}
-    <button class="go" id="again">Rejouer</button>
-    <p class="fine">Cas réels, chiffres arrondis, graphiques illustratifs. Ceci n’est pas un conseil en investissement, Nigel non plus.</p>`);
+    ${squeeze ? `<p>${t.lesson}</p>` : ''}
+    ${success ? `<div class="msg"><span class="from">Nigel</span><br>${t.keys}</div>
+      <button class="go" id="toL2">${t.toL2win}</button>
+      <button class="alt" id="again">${t.again1}</button>` : `<button class="go" id="again">${t.again}</button>
+      <button class="alt" id="toL2">${t.l2}</button>`}
+    <button class="alt" id="toMenu">${t.menu}</button>
+    <p class="fine">${t.fine}</p>`);
   $('#again').onclick = newGame;
+  $('#toL2').onclick = () => { closeModal(); raceIntro(); };
+  $('#toMenu').onclick = () => { S = null; resetBoard(); intro(); };
+}
+function resetBoard() {
+  cancelAnimationFrame(raf); clearTimeout(nextTimer);
+  $('#result').classList.remove('on'); $('#date').textContent = '–'; $('#kind').textContent = '';
+  $('#deciding').classList.remove('hide'); $('#bNext').classList.add('hide');
+  $('#stake').textContent = money(3e6, false); $('#timeBar').style.width = '100%';
+  mood('neutral'); updateTop(); applyStatic();
 }
 
 // ---------- Fenêtres ----------
@@ -507,34 +897,298 @@ function openModal(html) { $('#sheet').innerHTML = html; $('#modal').classList.a
 function closeModal() { $('#modal').classList.remove('on'); }
 
 function intro() {
+  const t = T();
+  const raceBest = store.get('raceBest', null);
   openModal(`
-    <div class="hero">${pingSVG()}<h2 class="title">Ping<small>Trader à Londres</small></h2></div>
-    <p>Nigel, le patron du desk, te confie douze opportunités tirées de l’histoire des marchés. Tu as sept secondes pour chacune.</p>
-    <ul class="rules">
-      <li><span class="chip l">↑ Long</span><span>Tu achètes : tu gagnes si ça monte.</span></li>
-      <li><span class="chip s">↓ Short</span><span>Tu vends à découvert : tu gagnes si ça baisse. Mais si ça monte, la perte n’a pas de limite.</span></li>
-      <li><span class="chip o">Vitesse</span><span>Décide vite, tu mises jusqu’à 3 millions. Hésite, la mise fond jusqu’à 1 million. Sans décision, tu paies des frais.</span></li>
-      <li><span class="chip n">−£10 M</span><span>Au-delà de 10 millions de pertes, Ping est viré.</span></li>
-    </ul>
-    <button class="go" id="start">Ouvrir le marché</button>
-    ${best !== null ? `<p class="fine">Ton record : ${money(best)}</p>` : ''}
-    <p class="fine">Raccourcis clavier : ← short, → long, Entrée pour passer à la suite.</p>`);
+    <div class="seg" role="group" aria-label="${t.langLbl}"><button data-lang="fr" aria-pressed="${LANG === 'fr'}">Français</button><button data-lang="en" aria-pressed="${LANG === 'en'}">English</button></div>
+    <div class="hero">${pingSVG()}<h2 class="title">Ping<small>${t.sub}</small></h2></div>
+    <p>${t.introP}</p>
+    <ul class="rules">${t.rules.map(r => `<li><span class="chip ${r[0]}">${r[1]}</span><span>${r[2]}</span></li>`).join('')}</ul>
+    <button class="go" id="start">${t.l1}</button>
+    <button class="alt" id="startL2">${t.l2}</button>
+    ${best !== null ? `<p class="fine">${t.yourRecord(money(best))}</p>` : ''}
+    ${raceBest !== null ? `<p class="fine" style="margin-top:2px">${t.yourRace(fmtTime(raceBest))}</p>` : ''}
+    <p class="fine">${t.keysHint}</p>`);
+  document.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { if (b.dataset.lang !== LANG) { setLang(b.dataset.lang); intro(); } });
   $('#start').onclick = newGame;
+  $('#startL2').onclick = () => { closeModal(); raceIntro(); };
+}
+
+// =================== NIVEAU 2 : la Racing Car de Nigel ===================
+const RE = RaceEngine;
+let RT = null, RC = null, RS = null, rRaf = 0, rLast = 0;
+const rc = $('#rc'), rctx = rc.getContext('2d'), mini = $('#mini'), mctx = mini.getContext('2d');
+const rIn = { left: false, right: false, brake: false };
+const ANGRY = { brake: 0.35, slip: 0.45, kerb: 0.35, edge: 0.6, wrong: 0.3, slow: 0.15, crash: 1 };
+function makePattern(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); return rctx.createPattern(c, 'repeat'); }
+let PAT = null, PATHS = null, miniBase = null;
+
+function prepareTrack() {
+  if (RT) return;
+  RT = RE.buildTrack();
+  const { N, x, y, nx, ny, kerb } = RT;
+  const center = new Path2D(), left = new Path2D(), right = new Path2D(), kerbs = new Path2D();
+  for (let i = 0; i <= N; i++) {
+    const j = i % N;
+    center[i ? 'lineTo' : 'moveTo'](x[j], y[j]);
+    left[i ? 'lineTo' : 'moveTo'](x[j] + nx[j] * RE.HW, y[j] + ny[j] * RE.HW);
+    right[i ? 'lineTo' : 'moveTo'](x[j] - nx[j] * RE.HW, y[j] - ny[j] * RE.HW);
+  }
+  let inRun = false;
+  for (let i = 0; i <= N; i++) { const j = i % N; if (kerb[j]) { kerbs[inRun ? 'lineTo' : 'moveTo'](x[j], y[j]); inRun = true; } else inRun = false; }
+  PATHS = { center, left, right, kerbs };
+  PAT = {
+    grass: makePattern(160, 160, (g, w, h) => { g.fillStyle = '#3F8040'; g.fillRect(0, 0, w, h); g.fillStyle = '#468A45'; g.fillRect(0, 0, w, h / 2); for (let i = 0; i < 260; i++) { g.fillStyle = `rgba(20,60,20,${Math.random() * 0.12})`; g.fillRect(Math.random() * w, Math.random() * h, 2, 2); } }),
+    gravel: makePattern(64, 64, (g, w, h) => { g.fillStyle = '#DCCBA3'; g.fillRect(0, 0, w, h); for (let i = 0; i < 420; i++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(120,95,60,.28)' : 'rgba(255,255,255,.35)'; g.fillRect(Math.random() * w, Math.random() * h, 1.6, 1.6); } }),
+  };
+  const minX = Math.min(...x), maxX = Math.max(...x), minY = Math.min(...y), maxY = Math.max(...y);
+  const ms = Math.min(108 / (maxX - minX), 74 / (maxY - minY));
+  RT.mini = { minX, minY, s: ms, ox: (118 - (maxX - minX) * ms) / 2, oy: (84 - (maxY - minY) * ms) / 2 };
+  miniBase = document.createElement('canvas'); miniBase.width = 236; miniBase.height = 168;
+  const g = miniBase.getContext('2d'); g.scale(2, 2); g.translate(RT.mini.ox, RT.mini.oy);
+  g.strokeStyle = 'rgba(255,241,229,.85)'; g.lineWidth = 3; g.lineJoin = 'round'; g.beginPath();
+  for (let i = 0; i <= N; i++) { const j = i % N; g[i ? 'lineTo' : 'moveTo']((x[j] - minX) * ms, (y[j] - minY) * ms); }
+  g.stroke();
+}
+function sizeRace() {
+  const d = Math.min(2, window.devicePixelRatio || 1);
+  rc.width = Math.round(innerWidth * d); rc.height = Math.round(innerHeight * d);
+}
+function nigelSay(key, force) {
+  if (!RS) return;
+  if (!force && RS.cool > 0) return;
+  const pool = LINES2[LANG][key]; let t = pick(pool);
+  if (pool.length > 1 && t === RS.lastLine) t = pick(pool);
+  RS.lastLine = t;
+  $('#rSay').textContent = t;
+  RS.cool = key === 'calm' ? 3.5 : 1.7;
+  RS.anger = Math.min(1, RS.anger + (ANGRY[key] || 0));
+  if ((ANGRY[key] || 0) >= 0.35) { RS.shake = 0.3; if (!reduce) $('#rSay').animate([{ transform: 'scale(1.08) rotate(-1deg)' }, { transform: 'none' }], { duration: 260 }); }
+  nigelFace();
+}
+function nigelFace() {
+  const a = RS ? RS.anger : 0;
+  const mix = (c1, c2) => c1.map((v, i) => Math.round(v + (c2[i] - v) * a));
+  const [r, g, b] = mix([240, 194, 160], [226, 86, 74]);
+  $('#nSkin').setAttribute('fill', `rgb(${r},${g},${b})`);
+  $('#nBrows').setAttribute('d', a > 0.4 ? 'M17 23l10 5M43 23l-10 5' : 'M17 26l9 1M43 26l-9 1');
+  $('#nMouth').setAttribute('ry', a > 0.4 ? 5 : 1.6);
+}
+function raceIntro(skipModal) {
+  prepareTrack();
+  applyStatic();
+  $('#race').classList.remove('hide');
+  sizeRace();
+  RC = RE.newCar(RT);
+  RS = { state: 'intro', t: 0, cool: 0, anger: 0, shake: 0, cam: RC.th, skids: [], parts: [], lastLine: '', calmT: 0, braking: 0, endT: 0, count: 0 };
+  $('#rSay').textContent = T().rHello; $('#rCount').textContent = '';
+  nigelFace(); updateRaceHud(); drawRace();
+  cancelAnimationFrame(rRaf); rLast = 0; rRaf = requestAnimationFrame(raceLoop);
+  if (skipModal) { raceCountdown(); return; }
+  const t = T(), rb = store.get('raceBest', null);
+  openModal(`
+    <h2 class="rank" style="font-size:28px;margin:0">${t.rTitle}</h2>
+    <p>${t.rP}</p>
+    <ul class="rules">${t.rRules.map(r => `<li><span class="chip ${r[0]}">${r[1]}</span><span>${r[2]}</span></li>`).join('')}</ul>
+    <button class="go" id="rGo">${t.rGo}</button>
+    <button class="alt" id="rBack">${t.menu}</button>
+    ${rb !== null ? `<p class="fine">${t.yourRace(fmtTime(rb))}</p>` : ''}
+    <p class="fine">${t.rKeys}</p>`);
+  $('#rGo').onclick = () => { closeModal(); raceCountdown(); };
+  $('#rBack').onclick = exitRace;
+}
+function raceCountdown() { RS.state = 'count'; RS.count = 2.4; nigelSay('start', true); }
+function updateRaceHud() {
+  $('#rLap').textContent = `${Math.min(RC.lap + 1, 2)} / 2`;
+  $('#rTime').textContent = fmtTime(RS.state === 'intro' || RS.state === 'count' ? 0 : RS.t);
+  $('#rSpeed').textContent = Math.round(RC.v * T().unitK);
+}
+function raceLoop(now) {
+  if (!RS) return;
+  const dt = rLast ? Math.min(0.05, (now - rLast) / 1000) : 0; rLast = now;
+  const paused = $('#modal').classList.contains('on') && RS.state === 'run';
+  if (!paused && dt > 0) raceUpdate(dt);
+  drawRace();
+  rRaf = requestAnimationFrame(raceLoop);
+}
+function raceUpdate(dt) {
+  const cnt = $('#rCount');
+  if (RS.state === 'count') {
+    RS.count -= dt;
+    if (RS.count > 0) cnt.textContent = String(Math.min(3, Math.ceil(RS.count / 0.8)));
+    else { cnt.textContent = T().go; RS.state = 'run'; RS.t = 0; setTimeout(() => { if (cnt.textContent === T().go) cnt.textContent = ''; }, 700); }
+    updateRaceHud();
+    return;
+  }
+  RS.cool -= dt; RS.anger = Math.max(0, RS.anger - dt * 0.18); RS.shake = Math.max(0, RS.shake - dt);
+  if (RS.state === 'run') {
+    RS.t += dt;
+    const inp = { steer: (rIn.right ? 1 : 0) - (rIn.left ? 1 : 0), brake: rIn.brake };
+    let rest = dt;
+    while (rest > 1e-6) { const h = Math.min(1 / 120, rest); RE.step(RT, RC, inp, h); rest -= h; if (RC.crashed || RC.lapped) break; }
+    if (RC.lapped) { if (RC.lap >= 2) return raceFinish(); nigelSay('lap', true); }
+    if (RC.crashed) return raceCrash();
+    let ahead = 1e9; for (let s = 3; s < 20; s++) ahead = Math.min(ahead, RT.brakeAt[(RC.idx + s) % RT.N]);
+    let key = null;
+    if (RC.wrongWay) key = 'wrong';
+    else if (Math.abs(RC.lat) > RE.HW + 3) key = 'edge';
+    else if (RC.slip > 0.22) key = 'slip';
+    else if (RC.kerb) key = 'kerb';
+    else if (RC.v > ahead * 1.07 && !inp.brake) key = 'brake';
+    if (inp.brake && RC.v < 140 && ahead > 260) RS.braking += dt; else RS.braking = 0;
+    if (!key && RS.braking > 1.2) key = 'slow';
+    if (key) { nigelSay(key); RS.calmT = 0; } else { RS.calmT += dt; if (RS.calmT > 5) { nigelSay('calm'); RS.calmT = 0; } }
+    if (RC.slip > 0.16 || (inp.brake && RC.v > 220)) {
+      const c = Math.cos(RC.th), s = Math.sin(RC.th);
+      for (const side of [-1, 1]) RS.skids.push([RC.x - c * 15 - s * 11 * side, RC.y - s * 15 + c * 11 * side]);
+      if (RC.slip > 0.16 && Math.random() < 0.6) RS.parts.push({ x: RC.x - c * 20, y: RC.y - s * 20, r: 6, a: 0.5, vx: 0, vy: 0, col: '220,220,220' });
+      if (RS.skids.length > 900) RS.skids.splice(0, RS.skids.length - 900);
+    }
+  } else if (RS.state === 'crash' || RS.state === 'finish') {
+    RS.endT += dt;
+    RC.v *= Math.exp(-(RS.state === 'crash' ? 3 : 1.6) * dt);
+    RC.x += Math.cos(RC.ph) * RC.v * dt; RC.y += Math.sin(RC.ph) * RC.v * dt;
+    if (RS.state === 'crash' && RC.v > 20) for (let k = 0; k < 2; k++) RS.parts.push({ x: RC.x + rnd(-14, 14), y: RC.y + rnd(-14, 14), r: rnd(5, 10), a: 0.7, vx: rnd(-30, 30), vy: rnd(-30, 30), col: '205,185,140' });
+  }
+  for (const p of RS.parts) { p.r += dt * 26; p.a -= dt * 0.7; p.x += p.vx * dt; p.y += p.vy * dt; }
+  RS.parts = RS.parts.filter(p => p.a > 0);
+  RS.cam += RE.wrap(RC.th - RS.cam) * Math.min(1, dt * 4.5);
+  updateRaceHud();
+}
+function raceCrash() {
+  RS.state = 'crash'; RS.endT = 0; RS.anger = 1; nigelSay('crash', true); nigelFace();
+  setTimeout(() => {
+    if (!RS || RS.state !== 'crash') return;
+    const t = T();
+    openModal(`
+      <div class="fca">${t.crashT}</div>
+      <p>${RC.lap ? t.crashLap : t.crashNoLap} ${t.crashTip}</p>
+      <button class="go" id="rRetry">${t.retry}</button>
+      <button class="alt" id="rMenu">${t.menu}</button>`);
+    $('#rRetry').onclick = () => { closeModal(); raceIntro(true); };
+    $('#rMenu').onclick = exitRace;
+  }, 1600);
+}
+function raceFinish() {
+  RS.state = 'finish'; RS.endT = 0; RS.anger = 0; nigelSay('finish', true); nigelFace();
+  const time = RS.t;
+  const stars = time <= 48 ? 3 : time <= 60 ? 2 : 1;
+  const prev = store.get('raceBest', null);
+  const rec = prev === null || time < prev;
+  if (rec) store.set('raceBest', time);
+  setTimeout(() => {
+    if (!RS || RS.state !== 'finish') return;
+    const t = T();
+    openModal(`
+      <div class="rank" style="font-size:28px">${t.finT}</div>
+      <div class="score up">${fmtTime(time)}</div>
+      <div style="font-size:30px;letter-spacing:4px;margin:4px 0" aria-label="${stars} / 3">${'★'.repeat(stars)}<span style="opacity:.25">${'★'.repeat(3 - stars)}</span></div>
+      <p class="fine" style="margin-top:0">${rec ? t.newRecord : t.record(fmtTime(prev))} ${t.stars3}</p>
+      <p>${t.nigelSays(t.finQ[stars - 1])}</p>
+      <button class="go" id="rRetry">${t.again2}</button>
+      <button class="alt" id="rMenu">${t.menu}</button>`);
+    $('#rRetry').onclick = () => { closeModal(); raceIntro(true); };
+    $('#rMenu').onclick = exitRace;
+  }, 1500);
+}
+function exitRace() {
+  cancelAnimationFrame(rRaf); RS = null;
+  $('#race').classList.add('hide');
+  closeModal(); intro();
+}
+function rr(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function drawCar(g, c) {
+  g.save(); g.translate(c.x, c.y); g.rotate(c.th);
+  g.fillStyle = 'rgba(0,0,0,.3)'; rr(g, -24, -10, 50, 24, 9); g.fill();
+  g.fillStyle = '#121212';
+  for (const [wx, wy] of [[14, -13], [14, 8], [-17, -13.5], [-17, 8.5]]) { rr(g, wx, wy, 11, 5, 1.5); g.fill(); }
+  const grd = g.createLinearGradient(0, -12, 0, 12);
+  grd.addColorStop(0, '#9C0D16'); grd.addColorStop(0.5, '#E3262E'); grd.addColorStop(1, '#9C0D16');
+  g.fillStyle = grd;
+  g.beginPath();
+  g.moveTo(26, -6); g.quadraticCurveTo(28, 0, 26, 6); g.lineTo(14, 10.5); g.lineTo(-18, 11.5); g.quadraticCurveTo(-25, 11, -25, 6);
+  g.lineTo(-25, -6); g.quadraticCurveTo(-25, -11, -18, -11.5); g.lineTo(14, -10.5); g.closePath(); g.fill();
+  g.fillStyle = '#151515'; g.fillRect(-27, -11, 4, 22);
+  g.fillStyle = 'rgba(25,35,55,.92)'; g.beginPath(); g.moveTo(9, -8); g.lineTo(13, -6); g.lineTo(13, 6); g.lineTo(9, 8); g.closePath(); g.fill();
+  g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(-14, -9.5, 8, 2); g.fillRect(-14, 7.5, 8, 2);
+  g.fillStyle = '#FFF4D6'; g.fillRect(23, -8, 2.5, 3); g.fillRect(23, 5, 2.5, 3);
+  g.fillStyle = '#FF7A1A'; g.beginPath(); g.arc(-1, -5, 5.6, 0, 7); g.fill();
+  g.fillStyle = '#151B2C'; g.beginPath(); g.arc(-1.5, -5, 3.9, 0, 7); g.fill();
+  g.lineWidth = 1; g.strokeStyle = '#8E1B2B'; g.stroke();
+  g.fillStyle = RS && RS.anger > 0.4 ? 'rgb(226,96,80)' : 'rgb(240,194,160)'; g.beginPath(); g.arc(-1, 5, 5, 0, 7); g.fill();
+  g.strokeStyle = '#B8B8B8'; g.lineWidth = 2.2; g.beginPath(); g.arc(-1, 5, 4.6, 0.6 * Math.PI, 1.4 * Math.PI); g.stroke();
+  g.restore();
+}
+function drawRace() {
+  if (!RT || !RC) return;
+  const g = rctx, w = rc.width, h = rc.height, d = w / innerWidth;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  const z = Math.max(0.55, Math.min(1.45, innerHeight / 620)) * d * (1 - 0.12 * RC.v / RE.PHY.vmax);
+  const sx = RS && RS.shake ? rnd(-3, 3) * d : 0, sy = RS && RS.shake ? rnd(-3, 3) * d : 0;
+  g.translate(w / 2 + sx, h * 0.64 + sy); g.rotate(-(RS ? RS.cam : RC.th) - Math.PI / 2); g.scale(z, z); g.translate(-RC.x, -RC.y);
+  g.fillStyle = PAT.grass; g.fillRect(RC.x - 1600, RC.y - 1600, 3200, 3200);
+  const P = PATHS;
+  g.lineJoin = 'round'; g.lineCap = 'round';
+  g.strokeStyle = '#ECE7DA'; g.lineWidth = 2 * (RE.HW + RE.KO + RE.GR) + 16; g.stroke(P.center);
+  g.strokeStyle = '#26282C'; g.setLineDash([16, 16]); g.stroke(P.center); g.setLineDash([]);
+  g.strokeStyle = PAT.gravel; g.lineWidth = 2 * (RE.HW + RE.KO + RE.GR); g.stroke(P.center);
+  g.strokeStyle = '#4B4E55'; g.lineWidth = 2 * (RE.HW + RE.KO); g.stroke(P.center);
+  g.lineCap = 'butt';
+  g.strokeStyle = '#D6252F'; g.stroke(P.kerbs);
+  g.strokeStyle = '#F4F1EA'; g.setLineDash([10, 10]); g.stroke(P.kerbs); g.setLineDash([]);
+  g.lineCap = 'round';
+  g.strokeStyle = '#4B4E55'; g.lineWidth = 2 * RE.HW; g.stroke(P.center);
+  g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 2.2; g.stroke(P.left); g.stroke(P.right);
+  g.save(); g.translate(RT.x[0], RT.y[0]); g.rotate(Math.atan2(RT.ty[0], RT.tx[0]));
+  for (let i = 0; i < 12; i++) for (let j = 0; j < 2; j++) { g.fillStyle = (i + j) % 2 ? '#111' : '#fff'; g.fillRect(-8 + j * 8, -RE.HW + i * (2 * RE.HW / 12), 8, 2 * RE.HW / 12); }
+  g.restore();
+  if (RS && RS.skids.length) { g.fillStyle = 'rgba(20,20,20,.22)'; for (const s of RS.skids) g.fillRect(s[0] - 2, s[1] - 2, 4, 4); }
+  drawCar(g, RC);
+  if (RS) for (const p of RS.parts) { g.fillStyle = `rgba(${p.col},${Math.max(0, p.a)})`; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.fill(); }
+  const m = RT.mini;
+  mctx.setTransform(1, 0, 0, 1, 0, 0); mctx.clearRect(0, 0, 236, 168); mctx.drawImage(miniBase, 0, 0);
+  mctx.setTransform(2, 0, 0, 2, 0, 0); mctx.translate(m.ox, m.oy);
+  mctx.fillStyle = '#FF7A1A'; mctx.beginPath(); mctx.arc((RC.x - m.minX) * m.s, (RC.y - m.minY) * m.s, 3.6, 0, 7); mctx.fill();
+  mctx.strokeStyle = '#14213D'; mctx.lineWidth = 1.2; mctx.stroke();
+}
+function racePause(msgKey) {
+  const t = T();
+  openModal(`<h2 class="rank" style="margin:0">${t.pauseT}</h2><p>${t[msgKey]}</p><button class="go" id="rRes">${t.resume}</button><button class="alt" id="rMenu">${t.menu}</button>`);
+  $('#rRes').onclick = () => { closeModal(); rLast = 0; };
+  $('#rMenu').onclick = exitRace;
 }
 
 // ---------- Commandes ----------
 $('#bShort').addEventListener('click', () => decide('short'));
 $('#bLong').addEventListener('click', () => decide('long'));
 $('#bNext').addEventListener('click', () => { if (S && S.phase === 'reveal') nextRound(); });
+document.querySelectorAll('[data-k]').forEach(b => {
+  const k = b.dataset.k;
+  const on = e => { e.preventDefault(); rIn[k] = true; b.classList.add('on'); try { b.setPointerCapture(e.pointerId); } catch (_) {} };
+  const off = () => { rIn[k] = false; b.classList.remove('on'); };
+  b.addEventListener('pointerdown', on);
+  b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('lostpointercapture', off);
+  b.addEventListener('contextmenu', e => e.preventDefault());
+});
+const keyMap = { ArrowLeft: 'left', a: 'left', q: 'left', ArrowRight: 'right', d: 'right', ArrowDown: 'brake', s: 'brake', ' ': 'brake' };
+const racing = () => RS && !$('#race').classList.contains('hide');
 document.addEventListener('keydown', e => {
+  if (racing()) { const k = keyMap[e.key]; if (k) { e.preventDefault(); rIn[k] = true; document.querySelector(`[data-k="${k}"]`).classList.add('on'); } return; }
   if (!S || $('#modal').classList.contains('on')) return;
   if (e.key === 'ArrowLeft') decide('short');
   else if (e.key === 'ArrowRight') decide('long');
   else if ((e.key === 'Enter' || e.key === ' ') && S.phase === 'reveal') { e.preventDefault(); nextRound(); }
 });
+document.addEventListener('keyup', e => { const k = keyMap[e.key]; if (k) { rIn[k] = false; const b = document.querySelector(`[data-k="${k}"]`); if (b) b.classList.remove('on'); } });
+window.addEventListener('resize', () => { if (RS) sizeRace(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && RS && RS.state === 'run' && !$('#modal').classList.contains('on')) racePause('pause1'); });
+$('#rQuit').addEventListener('click', () => { if (!RS) return; if (RS.state === 'run') racePause('pause2'); else exitRace(); });
 
-drawChart({ ipo: false });
-intro();
+// ---------- Démarrage ----------
+applyStatic();
+const qs = new URLSearchParams(location.search);
+if (qs.get('lang') === 'en' || qs.get('lang') === 'fr') setLang(qs.get('lang'));
+if (qs.get('niveau') === '2' || qs.get('level') === '2') raceIntro(); else intro();
 })();
 </script>
 </body>
