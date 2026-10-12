@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14213D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ping">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='60' r='34' fill='%23FF7A1A'/%3E%3Cellipse cx='50' cy='31' rx='32' ry='7' fill='%23151B2C'/%3E%3Cpath d='M29 31C29 9 71 9 71 31z' fill='%23151B2C'/%3E%3Ccircle cx='40' cy='60' r='5' fill='%23151B2C'/%3E%3Ccircle cx='60' cy='60' r='5' fill='%23151B2C'/%3E%3C/svg%3E">
+<title>Ping, trader à Londres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFF1E5; --card:#FFF9F3; --ink:#14213D; --ink2:#5A6480; --line:#EED6C2;
+  --navy:#14213D; --long:#0B7A4B; --short:#C8102E; --ball:#FF7A1A; --hat:#151B2C; --band:#8E1B2B;
+  --up:#8BE8B4; --down:#FF9EAA;
+  --font:"Bricolage Grotesque",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1828; --card:#172338; --ink:#F7E8DA; --ink2:#A7B0C4; --line:#28364F;
+    --navy:#0A1120; --long:#20A86C; --short:#E2334B; --hat:#34415F; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1828; --card:#172338; --ink:#F7E8DA; --ink2:#A7B0C4; --line:#28364F;
+  --navy:#0A1120; --long:#20A86C; --short:#E2334B; --hat:#34415F; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;background:var(--paper);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:var(--font);overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--ball);outline-offset:3px}
+#app{height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
+
+/* Barre du haut : costume à fines rayures */
+.top{flex:none;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:12px 16px 12px;color:#FFF1E5;border-radius:0 0 20px 20px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 1px,transparent 1px 10px),var(--navy)}
+.lbl{font-size:12.5px;opacity:.72;font-weight:500}
+.pnl{font-size:32px;font-weight:800;font-variation-settings:"opsz" 96;letter-spacing:-.03em;line-height:1;margin-top:2px;font-variant-numeric:tabular-nums}
+.pnl.up{color:var(--up)} .pnl.down{color:var(--down)}
+.round{text-align:right}
+.round b{display:block;font-size:20px;font-weight:700;line-height:1.1;margin-top:2px}
+.limit{height:4px;border-radius:4px;background:rgba(255,241,229,.15);margin-top:7px;overflow:hidden;width:120px}
+.limit i{display:block;height:100%;width:0;background:var(--down);transition:width .5s}
+
+.main{flex:1;min-height:0;overflow:auto;padding:0 14px}
+.ping-row{display:flex;align-items:center;gap:8px;padding-top:10px}
+.ping{width:62px;height:62px;flex:none;overflow:visible}
+.say{background:var(--card);border:1.5px solid var(--ink);border-radius:15px 15px 15px 4px;padding:7px 12px;font-weight:600;font-size:14.5px;line-height:1.3;max-width:100%}
+
+.deal{margin-top:10px;background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:14px 14px 8px}
+.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.date{background:var(--ink);color:var(--paper);border-radius:999px;padding:3px 10px;font-weight:700;font-size:12.5px}
+.name{font-size:29px;font-weight:800;font-variation-settings:"opsz" 72;letter-spacing:-.025em;line-height:1.05;margin:7px 0 5px}
+.teaser{font-size:15.5px;line-height:1.42;margin:0}
+.chart{display:block;width:100%;height:auto;margin-top:8px;overflow:hidden}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .now{stroke:var(--ink2);stroke-width:1;stroke-dasharray:3 4}
+.chart .pre{fill:none;stroke:var(--ink);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.chart .post{fill:none;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.chart text{font-family:var(--font);font-size:11px;fill:var(--ink2)}
+.chart .big{font-size:17px;font-weight:800}
+
+.result{display:none;margin-top:4px;padding:10px 0 4px;border-top:1.5px dashed var(--line)}
+.result.on{display:block}
+.delta{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.delta.up{color:var(--long)} .delta.down{color:var(--short)}
+.how{font-size:13.5px;color:var(--ink2);margin-top:3px}
+.outcome{font-size:15px;line-height:1.42;margin:7px 0 0}
+
+/* Bas : mise et boutons */
+.bottom{flex:none;padding:8px 14px 12px}
+.stake{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;color:var(--ink2);margin-bottom:5px}
+.stake b{font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin-bottom:10px}
+.bar i{display:block;height:100%;width:100%;background:var(--ball);border-radius:8px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.big-btn{border:0;border-radius:20px;padding:15px 8px 13px;color:#fff;font-weight:800;font-size:25px;letter-spacing:-.01em;display:flex;flex-direction:column;align-items:center;gap:1px;
+  box-shadow:0 4px 0 rgba(0,0,0,.22);transition:transform .08s}
+.big-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.22)}
+.big-btn small{font-size:12.5px;font-weight:600;opacity:.9;letter-spacing:0}
+.big-btn kbd{font-family:inherit;font-size:11px;opacity:.6;font-weight:500}
+.b-short{background:var(--short)} .b-long{background:var(--long)}
+.next{position:relative;overflow:hidden;width:100%;border:0;border-radius:20px;padding:17px;font-size:19px;font-weight:800;background:var(--ink);color:var(--paper)}
+.next span{position:relative;z-index:1}
+.next i{position:absolute;inset:0;width:0;background:var(--ball);opacity:.35}
+.hide{display:none!important}
+
+/* Fenêtres */
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(10,17,32,.55)}
+.modal.on{display:flex}
+.sheet{width:min(560px,100%);max-height:94%;overflow:auto;background:var(--paper);color:var(--ink);border-radius:24px 24px 0 0;
+  padding:22px 20px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:620px){.modal{align-items:center}.sheet{border-radius:24px;padding-bottom:22px}}
+.hero{display:flex;align-items:center;gap:14px}
+.hero .ping{width:96px;height:96px}
+.title{font-size:72px;font-weight:800;font-variation-settings:"opsz" 96;letter-spacing:-.05em;line-height:.85;margin:0}
+.title small{display:block;font-size:17px;letter-spacing:-.01em;font-weight:600;color:var(--ink2);margin-top:16px}
+.sheet p{font-size:15.5px;line-height:1.45;margin:10px 0}
+.rules{list-style:none;padding:0;margin:14px 0}
+.rules li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:15px;line-height:1.4}
+.rules li:last-child{border-bottom:1px solid var(--line)}
+.chip{flex:none;min-width:58px;text-align:center;border-radius:10px;padding:3px 0;color:#fff;font-weight:800;font-size:13px}
+.chip.l{background:var(--long)} .chip.s{background:var(--short)} .chip.o{background:var(--ball)} .chip.n{background:var(--ink);color:var(--paper)}
+.go{width:100%;border:0;border-radius:18px;padding:16px;font-size:19px;font-weight:800;background:var(--ball);color:#1A1205;margin-top:6px}
+.alt{width:100%;border:1.5px solid var(--line);background:transparent;border-radius:18px;padding:14px;font-size:16px;font-weight:700;margin-top:10px}
+.fine{font-size:12.5px;color:var(--ink2);margin-top:12px}
+.msg{background:var(--card);border:1.5px solid var(--line);border-radius:18px 18px 18px 6px;padding:12px 14px;font-size:16px;line-height:1.45;margin:12px 0}
+.from{font-size:13px;color:var(--ink2);font-weight:600}
+.score{font-size:52px;font-weight:800;letter-spacing:-.04em;line-height:1;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.score.up{color:var(--long)} .score.down{color:var(--short)}
+.rank{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+.stats div{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:9px 11px;font-size:12.5px;color:var(--ink2)}
+.stats b{display:block;font-size:17px;color:var(--ink);margin-top:2px;line-height:1.2}
+.fca{border:2px solid var(--short);border-radius:16px;padding:12px 14px;margin:12px 0}
+.fca strong{color:var(--short)}
+@media (max-height:700px){.name{font-size:24px}.teaser{font-size:14.5px}.ping{width:50px;height:50px}.big-btn{padding:12px 8px 10px;font-size:22px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="pingArt" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="97" rx="24" ry="3" fill="#000" opacity=".12"/>
+    <circle cx="50" cy="61" r="33" fill="var(--ball)"/>
+    <ellipse cx="37" cy="47" rx="9" ry="6" fill="#fff" opacity=".35"/>
+    <ellipse cx="50" cy="32" rx="32" ry="6.5" fill="var(--hat)"/>
+    <path d="M29 32C29 10 71 10 71 32z" fill="var(--hat)"/>
+    <path d="M29.6 25h40.8l.4 5H29.2z" fill="var(--band)"/>
+  </symbol>
+</svg>
+
+<div id="app">
+  <header class="top">
+    <div>
+      <div class="lbl">Résultat de Ping</div>
+      <div class="pnl" id="pnl">£0</div>
+    </div>
+    <div class="round">
+      <div class="lbl">Opportunité</div>
+      <b id="roundNo">–</b>
+      <div class="limit" title="Limite de perte : 10 millions"><i id="limitBar"></i></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="ping-row">
+      <svg class="ping" id="pingFace" viewBox="0 0 100 100" aria-hidden="true">
+        <use href="#pingArt"/>
+        <g id="eyes"><circle cx="40" cy="60" r="4.3" fill="#151B2C"/><circle cx="60" cy="60" r="4.3" fill="#151B2C"/></g>
+        <path id="mouth" d="M42 73Q50 76 58 73" fill="none" stroke="#151B2C" stroke-width="3" stroke-linecap="round"/>
+        <path id="sweat" d="M80 44c3 5 4 8 1.5 9.5S76 52 77 49z" fill="#7CC4FF" opacity="0"/>
+      </svg>
+      <div class="say" id="say" aria-live="polite">Prêt quand tu l’es.</div>
+    </div>
+
+    <section class="deal" aria-live="polite">
+      <div class="meta"><span class="date" id="date">–</span><span id="kind"></span></div>
+      <h1 class="name" id="name">La City vous attend</h1>
+      <p class="teaser" id="teaser">Douze opportunités du passé. Long si ça va monter, short si ça va baisser.</p>
+      <svg class="chart" id="chart" viewBox="0 0 320 168" role="img" aria-label="Graphique de cours illustratif"></svg>
+      <div class="result" id="result">
+        <div class="delta" id="delta"></div>
+        <div class="how" id="how"></div>
+        <p class="outcome" id="outcome"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottom">
+    <div id="deciding">
+      <div class="stake"><span>Mise de Ping <small>(plus tu tardes, plus elle fond)</small></span><b id="stake">£3,0 M</b></div>
+      <div class="bar"><i id="timeBar"></i></div>
+      <div class="btns">
+        <button class="big-btn b-short" id="bShort">↓ Short<small>ça va baisser</small></button>
+        <button class="big-btn b-long" id="bLong">↑ Long<small>ça va monter</small></button>
+      </div>
+    </div>
+    <button class="next hide" id="bNext"><i id="nextFill"></i><span id="nextTxt">Suivant</span></button>
+  </footer>
+</div>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<script>
+(() => {
+// Cas réels, chiffres arrondis (variation approximative sur la période indiquée)
+const CARDS = [
+  { n: 'Northern Rock', k: 'Banque, Londres', d: 'Septembre 2007', m: -0.55, t: "La banque hypothécaire de Newcastle demande l’aide d’urgence de la Banque d’Angleterre. La BBC l’annonce en direct.", o: "Files d’attente devant les agences : première panique bancaire britannique depuis plus d’un siècle. Nationalisée en février 2008.", p: 'en deux jours' },
+  { n: 'Lehman Brothers', k: 'Banque, New York', d: 'Septembre 2008', m: -0.94, t: "Le Trésor américain refuse de la sauver et Barclays renonce à la racheter. Week-end de réunions à la Fed de New York.", o: "Faillite le lundi 15 septembre 2008, la plus grande de l’histoire américaine.", p: 'en une séance' },
+  { n: 'Volkswagen', k: 'Action, Francfort', d: 'Octobre 2008', m: 3.48, t: "Les hedge funds ont massivement vendu VW à découvert. Porsche révèle contrôler près de 75 % des actions ordinaires, options comprises.", o: "Short squeeze historique : VW devient brièvement la plus grosse capitalisation boursière du monde.", p: 'en deux séances' },
+  { n: 'BP', k: 'Pétrole, Londres', d: 'Avril 2010', m: -0.53, t: "Explosion de la plateforme Deepwater Horizon dans le golfe du Mexique. Le puits fuit au fond de la mer.", o: "La fuite dure près de trois mois. BP suspend son dividende.", p: 'en deux mois' },
+  { n: 'Royal Mail', k: 'Introduction en bourse, Londres', d: 'Octobre 2013', m: 0.38, ipo: true, t: "Le gouvernement privatise la poste britannique à 330 pence l’action. Les investisseurs se bousculent.", o: "Le gouvernement est accusé d’avoir bradé la poste.", p: 'le premier jour' },
+  { n: 'EUR/CHF', k: 'Devise', d: '15 janvier 2015', m: -0.15, t: "Depuis 2011, la BNS défend un cours plancher de 1,20 franc pour un euro. 10 h 30 : communiqué surprise.", o: "La BNS abandonne le plancher. Le franc s’envole, des courtiers font faillite dans la journée.", p: 'dans la journée' },
+  { n: 'Volkswagen', k: 'Action, Francfort', d: 'Septembre 2015', m: -0.35, t: "L’agence américaine de l’environnement accuse VW d’avoir truqué les tests d’émissions de ses moteurs diesel.", o: "Le dieselgate éclate, le patron démissionne dans la semaine.", p: 'en deux séances' },
+  { n: 'Livre sterling', k: 'Devise, GBP/USD', d: '23 juin 2016', m: -0.10, t: "Soir du référendum sur l’Union européenne. Les sondages donnent le maintien gagnant, la livre monte.", o: "Le Leave l’emporte. La livre tombe à son plus bas niveau depuis 1985.", p: 'dans la nuit' },
+  { n: 'Bitcoin', k: 'Crypto', d: 'Décembre 2017', m: -0.80, t: "Le bitcoin approche 20 000 dollars. Ton chauffeur de taxi te demande comment en acheter.", o: "L’hiver crypto : un an plus tard, il vaut environ 3 500 dollars.", p: 'en un an' },
+  { n: 'Carillion', k: 'BTP, Londres', d: 'Juillet 2017', m: -0.39, t: "Le géant des contrats publics britanniques publie un avertissement sur résultats. Le directeur général démissionne.", o: "Liquidation en janvier 2018, des chantiers publics restent en plan.", p: 'en une séance' },
+  { n: 'Boeing', k: 'Aéronautique, New York', d: 'Mars 2019', m: -0.11, t: "Deuxième accident d’un 737 MAX en cinq mois, en Éthiopie.", o: "Le 737 MAX est cloué au sol dans le monde entier pendant près de deux ans.", p: 'en deux séances' },
+  { n: 'Zoom', k: 'Tech, New York', d: 'Février 2020', m: 0.55, t: "Un nouveau virus se propage en Europe. Les entreprises préparent le télétravail.", o: "Confinements : réunions, cours et apéros, tout passe en visio.", p: 'en un mois' },
+  { n: 'Zoom', k: 'Tech, New York', d: '9 novembre 2020', m: -0.17, t: "Pfizer annonce un vaccin efficace à plus de 90 % contre le Covid.", o: "Les valeurs du confinement plongent dans la journée.", p: 'dans la journée' },
+  { n: 'Wirecard', k: 'Paiements, Francfort', d: 'Juin 2020', m: -0.97, t: "L’auditeur ne trouve pas 1,9 milliard d’euros censés être sur des comptes aux Philippines.", o: "Insolvabilité une semaine plus tard, le directeur général est arrêté.", p: 'en une semaine' },
+  { n: 'GameStop', k: 'Distribution, New York', d: 'Janvier 2021', m: 16.4, t: "Chaîne de magasins de jeux vidéo en déclin, une des actions les plus vendues à découvert de Wall Street. Un forum Reddit s’enflamme.", o: "Short squeeze géant. Des hedge funds perdent des milliards, des courtiers bloquent les achats.", p: 'en deux semaines' },
+  { n: 'ViacomCBS', k: 'Médias, New York', d: 'Mars 2021', m: -0.52, t: "Un family office très endetté, Archegos, détient des positions énormes sur ViacomCBS, qui lance une augmentation de capital.", o: "Archegos ne peut plus payer ses appels de marge : ventes forcées, et des banques perdent des milliards, dont Credit Suisse.", p: 'en une semaine' },
+  { n: 'Dogecoin', k: 'Crypto', d: 'Mai 2021', m: -0.30, t: "Elon Musk, qui fait grimper le Dogecoin depuis des mois, présente l’émission Saturday Night Live.", o: "Il plaisante à l’antenne sur une « arnaque » : la crypto chute pendant l’émission.", p: 'pendant l’émission' },
+  { n: 'Meta (Facebook)', k: 'Tech, New York', d: 'Février 2022', m: -0.26, t: "Pour la première fois, le nombre d’utilisateurs quotidiens de Facebook baisse.", o: "Plus grosse perte de valeur boursière en une séance pour une entreprise américaine à l’époque.", p: 'en une séance' },
+  { n: 'Netflix', k: 'Streaming, New York', d: 'Avril 2022', m: -0.35, t: "Netflix annonce sa première perte d’abonnés depuis plus de dix ans.", o: "Plus d’un tiers de la valeur part en fumée.", p: 'en une séance' },
+  { n: 'Livre sterling', k: 'Devise, GBP/USD', d: 'Septembre 2022', m: -0.08, t: "Le nouveau gouvernement annonce 45 milliards de livres de baisses d’impôts, sans financement.", o: "La livre touche son plus bas historique face au dollar. La Banque d’Angleterre intervient, Liz Truss tient 49 jours.", p: 'en trois séances' },
+  { n: 'Silicon Valley Bank', k: 'Banque, Californie', d: 'Mars 2023', m: -0.60, t: "La banque des start-up annonce une perte sur ses obligations et une levée de fonds d’urgence.", o: "Les clients retirent 42 milliards de dollars en une journée. Faillite le lendemain.", p: 'en une séance' },
+  { n: 'Credit Suisse', k: 'Banque, Zurich', d: 'Mars 2023', m: -0.55, t: "Week-end de crise à Berne : la Confédération, la BNS et la FINMA organisent le sauvetage.", o: "Rachat par UBS pour 3 milliards de francs. Les obligations AT1 sont effacées.", p: 'le lundi' },
+  { n: 'UBS', k: 'Banque, Zurich', d: 'Mars 2023', m: 0.50, t: "UBS rachète Credit Suisse pour 3 milliards de francs, avec des garanties de la Confédération.", o: "Les marchés saluent l’opération jusqu’à la fin de l’année.", p: 'en neuf mois' },
+  { n: 'Nvidia', k: 'Puces, New York', d: 'Mai 2023', m: 0.24, t: "Le fabricant de puces publie ses prévisions. ChatGPT a six mois et tout le monde veut entraîner des IA.", o: "Prévisions très au-dessus des attentes : quelques jours plus tard, Nvidia vaut 1 000 milliards de dollars.", p: 'en une séance' },
+  { n: 'Arm', k: 'Introduction en bourse, New York', d: 'Septembre 2023', m: 0.25, ipo: true, t: "Le concepteur britannique de puces, dont les plans équipent presque tous les smartphones, entre en bourse à 51 dollars.", o: "Les investisseurs se ruent sur le titre dès l’ouverture.", p: 'le premier jour' },
+  { n: 'Rolls-Royce', k: 'Moteurs d’avion, Londres', d: 'Janvier 2023', m: 2.2, t: "Le nouveau directeur général compare l’entreprise à une « plateforme en feu » devant ses employés.", o: "Le redressement fonctionne : meilleure performance du FTSE 100 sur l’année.", p: 'en un an' },
+  { n: 'Tesla', k: 'Automobile, New York', d: 'Janvier 2020', m: 7.4, t: "L’usine de Shanghai livre ses premières voitures et Tesla enchaîne les trimestres bénéficiaires.", o: "Envolée sur l’année, puis entrée dans l’indice S&P 500 en décembre.", p: 'en un an' },
+  { n: 'Moderna', k: 'Biotech, Nasdaq', d: 'Janvier 2020', m: 4.3, t: "Une biotech qui n’a jamais vendu un seul produit commence à travailler sur un vaccin contre un nouveau coronavirus.", o: "Son vaccin à ARN messager est autorisé en décembre 2020.", p: 'en un an' },
+  { n: 'Apple', k: 'Tech, Nasdaq', d: 'Janvier 2007', m: 1.36, t: "Steve Jobs présente un téléphone sans clavier, avec un écran tactile.", o: "L’iPhone sort en juin et l’action fait plus que doubler dans l’année.", p: 'en un an' },
+  { n: 'Nokia', k: 'Téléphonie, Helsinki', d: 'Fin 2007', m: -0.95, t: "Nokia vend environ quatre téléphones portables sur dix dans le monde et son action est au plus haut.", o: "Les smartphones balaient tout. En 2013, Nokia cède sa division mobile à Microsoft.", p: 'en cinq ans' },
+  { n: 'Facebook', k: 'Introduction en bourse, Nasdaq', d: 'Mai 2012', m: -0.54, ipo: true, t: "La plus grosse introduction en bourse de la tech de l’époque, à 38 dollars l’action.", o: "Couacs techniques le premier jour, doutes sur la publicité mobile : l’action est divisée par deux.", p: 'en quatre mois' },
+  { n: 'Swissair', k: 'Aviation, Zurich', d: 'Septembre 2001', m: -0.90, t: "La « banque volante » s’est lourdement endettée en achetant des participations dans des compagnies européennes.", o: "Grounding le 2 octobre 2001 : les avions restent au sol, faute d’argent pour payer le kérosène.", p: 'en quelques semaines' },
+  { n: 'Livre sterling', k: 'Devise, GBP/DEM', d: '16 septembre 1992', m: -0.12, t: "Londres veut garder la livre dans le Système monétaire européen et relève ses taux deux fois dans la journée. George Soros a une position énorme.", o: "La livre sort du système le soir même. Soros gagne environ un milliard de dollars.", p: 'en quelques semaines' },
+  { n: 'Bitcoin', k: 'Crypto', d: 'Octobre 2020', m: 4.5, t: "Le bitcoin vaut environ 11 000 dollars. Des sociétés cotées commencent à en mettre dans leur trésorerie.", o: "Il dépasse 60 000 dollars en avril 2021.", p: 'en six mois' },
+  { n: 'Microsoft', k: 'Tech, Nasdaq', d: 'Janvier 2023', m: 0.57, t: "Microsoft annonce un investissement de plusieurs milliards de dollars dans OpenAI, le créateur de ChatGPT.", o: "L’IA arrive dans tous ses produits, et dans son cours de bourse.", p: 'en un an' },
+  { n: 'Novo Nordisk', k: 'Pharma, Copenhague', d: 'Janvier 2023', m: 0.50, t: "Son médicament contre l’obésité, Wegovy, est en rupture de stock tellement la demande est forte.", o: "Novo devient la plus grosse capitalisation boursière d’Europe en septembre 2023.", p: 'en un an' },
+  { n: 'Peloton', k: 'Fitness, Nasdaq', d: 'Janvier 2021', m: -0.76, t: "Le vélo d’appartement connecté est la star du confinement. Les vaccins arrivent, les salles de sport vont rouvrir.", o: "Les ventes ralentissent, rappel de tapis de course : l’action perd les trois quarts de sa valeur.", p: 'en un an' },
+];
+
+const T = 7000, BASE = 1e6, FIRE = -10e6, ROUNDS = 12, FEE = 100e3;
+const $ = s => document.querySelector(s);
+const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('ping:' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('ping:' + k, JSON.stringify(v)); } catch (e) {} },
+};
+let best = store.get('best', null);
+let S = null, raf = 0, nextTimer = 0;
+
+// ---------- Formats ----------
+const nf1 = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const nf0 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+function money(x, sign = true) {
+  const a = Math.abs(x);
+  const v = a >= 1e6 ? nf1.format(a / 1e6) + '\u00A0M' : nf0.format(Math.round(a / 1e3)) + '\u00A0k';
+  if (a < 500) return '£0';
+  return (sign ? (x < 0 ? '−' : '+') : '') + '£' + v;
+}
+const pct = m => (m >= 0 ? '+' : '−') + nf0.format(Math.round(Math.abs(m) * 100)) + '\u00A0%';
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[(Math.random() * a.length) | 0];
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+// ---------- Ping ----------
+const LINES = {
+  start: ['Vite, le marché n’attend pas.', 'Nigel me regarde, je le sens.', 'Ça sent le coup.', 'Concentration, Ping.', 'Un café, un trade.', 'Je le sens bien, celui-là.'],
+  win: ['Champagne au bar ce soir !', 'Ping, génie de la City.', 'Le bonus approche.', 'Trop facile.', 'Nigel a souri. Je crois.'],
+  smallLoss: ['Aïe.', 'C’était un test.', 'Personne n’a rien vu.', 'On se refait au prochain.'],
+  bigLoss: ['Ping transpire.', 'Ne dites rien à Nigel.', 'Je… je vais prendre l’air.', 'Mon bonus vient de s’évaporer.'],
+  late: ['J’ai hésité. Le client est parti.', 'Trop lent. Frais de dossier quand même.'],
+};
+const MOUTH = {
+  neutral: 'M42 73Q50 76 58 73',
+  happy: 'M37 70Q50 85 63 70',
+  sad: 'M40 78Q50 69 60 78',
+  panic: 'M44 75a6 7 0 1 0 12 0a6 7 0 1 0-12 0',
+};
+function mood(m) {
+  const mouth = $('#mouth');
+  mouth.setAttribute('d', MOUTH[m]);
+  mouth.setAttribute('fill', m === 'panic' ? '#151B2C' : 'none');
+  $('#sweat').setAttribute('opacity', m === 'panic' || m === 'sad' ? '1' : '0');
+  [...$('#eyes').children].forEach(e => e.setAttribute('r', m === 'panic' ? 5.6 : 4.3));
+  if (!reduce) {
+    const f = $('#pingFace');
+    if (m === 'happy') f.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-9px)' }, { transform: 'translateY(0)' }], { duration: 380, easing: 'ease-out' });
+    if (m === 'panic') f.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }], { duration: 260, iterations: 2 });
+  }
+}
+const say = t => { $('#say').textContent = t; };
+const pingSVG = (md = 'happy') => { const r = md === 'panic' ? 5.6 : 4.3; return `<svg class="ping" viewBox="0 0 100 100" aria-hidden="true"><use href="#pingArt"/><circle cx="40" cy="60" r="${r}" fill="#151B2C"/><circle cx="60" cy="60" r="${r}" fill="#151B2C"/><path d="${MOUTH[md]}" fill="${md === 'panic' ? '#151B2C' : 'none'}" stroke="#151B2C" stroke-width="3" stroke-linecap="round"/>${md === 'panic' || md === 'sad' ? '<path d="M80 44c3 5 4 8 1.5 9.5S76 52 77 49z" fill="#7CC4FF"/>' : ''}</svg>`; };
+
+// ---------- Graphique (illustratif, échelle logarithmique) ----------
+const W = 320, H = 168, Y0 = 90, K = 120, XNOW = 196;
+const yOf = v => Y0 - Math.log(v) * K;
+function prePath(card) {
+  const n = 34; const vals = [1]; let v = 1;
+  for (let i = 1; i < n; i++) { v *= Math.exp(gauss() * 0.022); vals.push(v); }
+  vals.reverse();
+  const start = card.ipo ? 22 : 0;
+  let d = '';
+  for (let i = start; i < n; i++) {
+    const x = 8 + i * ((XNOW - 8) / (n - 1));
+    const y = card.ipo ? Y0 : yOf(vals[i]);
+    d += (i === start ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+  }
+  return d;
+}
+function postPoints(m) {
+  const n = 16, L = Math.log(1 + m), pts = [[XNOW, Y0]];
+  for (let j = 1; j <= n; j++) {
+    const f = j / n;
+    const e = m < 0 ? 1 - Math.pow(1 - f, 2.4) : Math.pow(f, 1.35);
+    const noise = j === n ? 0 : gauss() * 0.035 * Math.max(0.2, Math.abs(L));
+    pts.push([XNOW + j * ((W - 8 - XNOW) / n), yOf(Math.exp(L * e + noise))]);
+  }
+  return pts;
+}
+function drawChart(card) {
+  $('#chart').innerHTML = `
+    <line class="grid" x1="0" x2="${W}" y1="30" y2="30"/><line class="grid" x1="0" x2="${W}" y1="150" y2="150"/>
+    <line class="now" x1="${XNOW}" x2="${XNOW}" y1="4" y2="${H - 4}"/>
+    <line class="now" x1="0" x2="${W}" y1="${Y0}" y2="${Y0}" opacity=".5"/>
+    <text x="${XNOW + 5}" y="14">maintenant</text>
+    ${card.ipo ? `<text x="8" y="${Y0 - 8}">prix d’introduction</text>` : ''}
+    <path class="pre" d="${prePath(card)}"/>`;
+}
+function revealChart(card) {
+  const pts = postPoints(card.m);
+  const color = card.m >= 0 ? 'var(--long)' : 'var(--short)';
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+  const svg = $('#chart');
+  const NS = 'http://www.w3.org/2000/svg';
+  const path = document.createElementNS(NS, 'path');
+  path.setAttribute('class', 'post'); path.setAttribute('d', d); path.setAttribute('stroke', color);
+  svg.appendChild(path);
+  const end = pts[pts.length - 1];
+  const out = end[1] < 8 || end[1] > H - 8;
+  const ly = card.m >= 0 ? H - 12 : 40;
+  const txt = document.createElementNS(NS, 'text');
+  txt.setAttribute('x', W - 8); txt.setAttribute('y', ly); txt.setAttribute('text-anchor', 'end');
+  txt.setAttribute('class', 'big'); txt.setAttribute('fill', color); txt.style.fill = color;
+  txt.textContent = (out ? (card.m >= 0 ? '↑ ' : '↓ ') : '') + pct(card.m);
+  if (!reduce) {
+    const len = path.getTotalLength();
+    path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+    path.getBoundingClientRect();
+    path.style.transition = 'stroke-dashoffset .9s cubic-bezier(.3,.6,.2,1)';
+    path.style.strokeDashoffset = 0;
+    setTimeout(() => svg.appendChild(txt), 750);
+  } else svg.appendChild(txt);
+}
+
+// ---------- Partie ----------
+function dealCards() {
+  const recent = new Set(store.get('recent', []));
+  const longs = shuffle(CARDS.filter(c => c.m > 0)), shorts = shuffle(CARDS.filter(c => c.m < 0));
+  const fresh = a => a.sort((x, y) => recent.has(x.n + x.d) - recent.has(y.n + y.d));
+  fresh(longs); fresh(shorts);
+  const nl = 4 + ((Math.random() * 4) | 0);
+  const hand = shuffle([...longs.slice(0, nl), ...shorts.slice(0, ROUNDS - nl)]);
+  store.set('recent', hand.map(c => c.n + c.d));
+  return hand;
+}
+
+function newGame() {
+  closeModal();
+  S = { cards: dealCards(), round: -1, pnl: 0, hist: [], insiderAt: 3 + ((Math.random() * 6) | 0), insider: null, phase: 'idle' };
+  updateTop();
+  nextRound();
+}
+
+function updateTop() {
+  const el = $('#pnl');
+  el.textContent = money(S ? S.pnl : 0);
+  el.className = 'pnl' + (S && S.pnl > 500 ? ' up' : S && S.pnl < -500 ? ' down' : '');
+  $('#roundNo').textContent = S && S.round >= 0 ? `${Math.min(S.round + 1, ROUNDS)} / ${ROUNDS}` : '–';
+  $('#limitBar').style.width = S ? Math.min(100, Math.max(0, -S.pnl / -FIRE * 100)) + '%' : '0';
+}
+
+function nextRound() {
+  clearTimeout(nextTimer);
+  if (S.pnl <= FIRE) return endGame('fired');
+  if (S.round + 1 >= ROUNDS) return endGame();
+  if (S.round + 1 === S.insiderAt && S.insider === null) return insiderTip();
+  S.round++;
+  const c = S.cards[S.round];
+  S.phase = 'decide';
+  $('#date').textContent = c.d; $('#kind').textContent = c.k; $('#name').textContent = c.n; $('#teaser').textContent = c.t;
+  $('#result').classList.remove('on');
+  drawChart(c);
+  $('#deciding').classList.remove('hide'); $('#bNext').classList.add('hide');
+  mood('neutral'); say(pick(LINES.start));
+  updateTop();
+  S.t0 = performance.now();
+  cancelAnimationFrame(raf);
+  const tick = now => {
+    if (S.phase !== 'decide') return;
+    const el = now - S.t0, f = Math.max(0, 1 - el / T);
+    $('#stake').textContent = money(BASE * (1 + 2 * f), false);
+    $('#timeBar').style.width = (f * 100) + '%';
+    if (el >= T) return decide(null);
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+}
+
+function decide(side) {
+  if (!S || S.phase !== 'decide') return;
+  S.phase = 'reveal';
+  cancelAnimationFrame(raf);
+  const c = S.cards[S.round];
+  const el = performance.now() - S.t0;
+  const mult = 1 + 2 * Math.max(0, 1 - el / T);
+  let delta, how;
+  if (side) {
+    delta = BASE * mult * c.m * (side === 'long' ? 1 : -1);
+    how = `${side === 'long' ? 'Long' : 'Short'} avec ${money(BASE * mult, false)} : ${pct(c.m)} ${c.p}`;
+  } else {
+    delta = -FEE;
+    how = `Pas de décision. Il fallait jouer ${c.m > 0 ? 'long' : 'short'} : ${pct(c.m)} ${c.p}`;
+  }
+  const correct = !!side && (c.m > 0) === (side === 'long');
+  S.pnl += delta;
+  S.hist.push({ c, side, delta, correct });
+  revealChart(c);
+  const dEl = $('#delta');
+  dEl.textContent = money(delta); dEl.className = 'delta ' + (delta >= 0 ? 'up' : 'down');
+  $('#how').textContent = how; $('#outcome').textContent = c.o;
+  $('#result').classList.add('on');
+  if (!side) { mood('sad'); say(pick(LINES.late)); }
+  else if (delta >= 0) { mood('happy'); say(pick(LINES.win)); }
+  else if (delta < -3e6) { mood('panic'); say(side === 'short' && c.m > 1 ? 'Short squeeze ! Ça monte sans plafond !' : pick(LINES.bigLoss)); }
+  else { mood('sad'); say(pick(LINES.smallLoss)); }
+  updateTop();
+  if (!reduce) $('#pnl').animate([{ transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' });
+  $('#deciding').classList.add('hide');
+  const nb = $('#bNext'); nb.classList.remove('hide');
+  const last = S.round + 1 >= ROUNDS || S.pnl <= FIRE;
+  $('#nextTxt').textContent = S.pnl <= FIRE ? 'Le patron veut te voir…' : last ? 'Voir le bilan' : 'Suivant';
+  const fill = $('#nextFill');
+  const wait = 5200;
+  fill.getAnimations && fill.getAnimations().forEach(a => a.cancel());
+  if (!reduce) fill.animate([{ width: '0%' }, { width: '100%' }], { duration: wait, easing: 'linear', fill: 'forwards' });
+  nextTimer = setTimeout(nextRound, wait);
+  setTimeout(() => $('#result').scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' }), 200);
+}
+
+// ---------- Tuyau d'initié ----------
+function insiderTip() {
+  S.phase = 'insider';
+  mood('neutral'); say('Mon téléphone vibre…');
+  openModal(`
+    <div class="from">WhatsApp, 22 h 47, Kevin (fusions-acquisitions)</div>
+    <div class="msg">Psst Ping. Demain matin on annonce le rachat de <b>Brexford Biscuits plc</b> avec 40 % de prime. Personne ne le sait encore 🤫 Tu achètes ce soir ?</div>
+    <button class="go" id="takeTip">J’achète discrètement</button>
+    <button class="alt" id="refuseTip">Je préviens la compliance</button>`);
+  $('#takeTip').onclick = () => {
+    S.insider = 'taken'; S.pnl += 4e6;
+    closeModal(); mood('happy'); say('+£4 M sur Brexford. Personne ne saura jamais…'); updateTop();
+    setTimeout(nextRound, 1400);
+  };
+  $('#refuseTip').onclick = () => {
+    S.insider = 'refused';
+    closeModal(); mood('happy'); say('La compliance m’offre un mug. Kevin passe une mauvaise journée.');
+    setTimeout(nextRound, 1400);
+  };
+}
+
+// ---------- Fin ----------
+function endGame(reason) {
+  S.phase = 'end';
+  clearTimeout(nextTimer); cancelAnimationFrame(raf);
+  let final = S.pnl, rank, line;
+  const banned = S.insider === 'taken';
+  if (banned) { final = Math.min(S.pnl - 4e6, 0) - 2e6; rank = 'Interdit d’exercer'; line = 'Ping vend désormais des parapluies à Leadenhall Market.'; }
+  else if (reason === 'fired') { rank = 'Viré'; line = 'Ping range ses affaires dans un carton. Nigel ne lève même pas les yeux.'; }
+  else if (final < 0) { rank = 'Stagiaire, encore un an'; line = 'Nigel est déçu, mais il a vu pire.'; }
+  else if (final < 5e6) { rank = 'Analyste junior'; line = 'Correct. Ping garde son badge.'; }
+  else if (final < 20e6) { rank = 'Trader confirmé'; line = 'Le bonus paiera les vacances à Mykonos.'; }
+  else if (final < 50e6) { rank = 'Chef de desk'; line = 'Ping a désormais une place réservée au pub.'; }
+  else { rank = 'Légende de la City'; line = 'On parlera de cette journée à Canary Wharf pendant des années.'; }
+  const ok = S.hist.filter(h => h.correct).length;
+  const bestT = S.hist.reduce((a, h) => !a || h.delta > a.delta ? h : a, null);
+  const worstT = S.hist.reduce((a, h) => !a || h.delta < a.delta ? h : a, null);
+  const isRecord = best === null || final > best;
+  if (isRecord) { best = final; store.set('best', best); }
+  const squeeze = worstT && worstT.side === 'short' && worstT.c.m > 1 && worstT.delta < -3e6;
+  const endMood = final >= 0 ? 'happy' : (reason === 'fired' || banned ? 'panic' : 'sad');
+  mood(endMood);
+  openModal(`
+    ${banned ? `<div class="fca"><strong>Le lendemain, 7 h 02 : la FCA saisit le téléphone de Ping.</strong><br>Les messages avec Kevin sont sur la table. Gains confisqués, amende, interdiction d’exercer. Au Royaume-Uni, le délit d’initié est une infraction pénale, en plus des sanctions de la FCA pour abus de marché.</div>` : ''}
+    <div class="hero">${pingSVG(endMood)}<div><div class="rank">${rank}</div><div class="fine" style="margin-top:4px">${line}</div></div></div>
+    <div class="score ${final >= 0 ? 'up' : 'down'}">${money(final)}</div>
+    <div class="fine" style="margin-top:0">${isRecord ? 'Nouveau record personnel.' : `Record : ${money(best)}`}</div>
+    <div class="stats">
+      <div>Bons choix<b>${ok} sur ${S.hist.length}</b></div>
+      <div>Compliance<b>${S.insider === 'refused' ? 'Un mug offert' : banned ? 'Dossier ouvert' : 'Rien à signaler'}</b></div>
+      ${bestT ? `<div>Meilleur coup<b>${bestT.c.n} ${money(bestT.delta)}</b></div>` : ''}
+      ${worstT ? `<div>Pire coup<b>${worstT.c.n} ${money(worstT.delta)}</b></div>` : ''}
+    </div>
+    ${squeeze ? `<p>Leçon de Nigel : en short, la perte n’a pas de plafond. Une action ne peut pas baisser de plus de 100 %, mais elle peut monter de 1&nbsp;000&nbsp;%.</p>` : ''}
+    <button class="go" id="again">Rejouer</button>
+    <p class="fine">Cas réels, chiffres arrondis, graphiques illustratifs. Ceci n’est pas un conseil en investissement, Nigel non plus.</p>`);
+  $('#again').onclick = newGame;
+}
+
+// ---------- Fenêtres ----------
+function openModal(html) { $('#sheet').innerHTML = html; $('#modal').classList.add('on'); $('#sheet').scrollTop = 0; }
+function closeModal() { $('#modal').classList.remove('on'); }
+
+function intro() {
+  openModal(`
+    <div class="hero">${pingSVG()}<h2 class="title">Ping<small>Trader à Londres</small></h2></div>
+    <p>Nigel, le patron du desk, te confie douze opportunités tirées de l’histoire des marchés. Tu as sept secondes pour chacune.</p>
+    <ul class="rules">
+      <li><span class="chip l">↑ Long</span><span>Tu achètes : tu gagnes si ça monte.</span></li>
+      <li><span class="chip s">↓ Short</span><span>Tu vends à découvert : tu gagnes si ça baisse. Mais si ça monte, la perte n’a pas de limite.</span></li>
+      <li><span class="chip o">Vitesse</span><span>Décide vite, tu mises jusqu’à 3 millions. Hésite, la mise fond jusqu’à 1 million. Sans décision, tu paies des frais.</span></li>
+      <li><span class="chip n">−£10 M</span><span>Au-delà de 10 millions de pertes, Ping est viré.</span></li>
+    </ul>
+    <button class="go" id="start">Ouvrir le marché</button>
+    ${best !== null ? `<p class="fine">Ton record : ${money(best)}</p>` : ''}
+    <p class="fine">Raccourcis clavier : ← short, → long, Entrée pour passer à la suite.</p>`);
+  $('#start').onclick = newGame;
+}
+
+// ---------- Commandes ----------
+$('#bShort').addEventListener('click', () => decide('short'));
+$('#bLong').addEventListener('click', () => decide('long'));
+$('#bNext').addEventListener('click', () => { if (S && S.phase === 'reveal') nextRound(); });
+document.addEventListener('keydown', e => {
+  if (!S || $('#modal').classList.contains('on')) return;
+  if (e.key === 'ArrowLeft') decide('short');
+  else if (e.key === 'ArrowRight') decide('long');
+  else if ((e.key === 'Enter' || e.key === ' ') && S.phase === 'reveal') { e.preventDefault(); nextRound(); }
+});
+
+drawChart({ ipo: false });
+intro();
+})();
+</script>
+</body>
+</html>
